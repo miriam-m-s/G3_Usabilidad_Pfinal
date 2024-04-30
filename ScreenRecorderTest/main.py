@@ -2,6 +2,7 @@ import pyautogui
 import cv2
 import numpy as np
 import time
+from PIL import Image, ImageDraw
 
 # Tamaño de la pantalla
 screen_width, screen_height = pyautogui.size()
@@ -10,30 +11,29 @@ screen_width, screen_height = pyautogui.size()
 duration = 10
 
 frames = []
-nFrames = 0
+mouse_info = []
 
 # Bucle de grabación
 start_time = time.time()
 while (time.time() - start_time) < duration:
-    # Captura de pantalla
-    screenshot = pyautogui.screenshot()
+    frames.append(pyautogui.screenshot())
+    mouse_info.append(pyautogui.position())
 
-    # Convertir la captura de pantalla a un formato compatible con OpenCV
-    frame = np.array(screenshot)
-    frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-    frames.append(frame)
-
-    nFrames += 1
-
-print(nFrames)
+fps = len(frames) / duration
+print(f'fps: {fps}')
+print(f'Total Frames: {len(frames)}')
 
 # Configurar el codec de video y el objeto VideoWriter
 fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # Codec para H.264 en MP4
-fps = nFrames / duration
-print(fps)
 out = cv2.VideoWriter('video.mp4', fourcc, fps, (screen_width, screen_height))
 
-for frame in frames:
+radius = 30
+
+for frame, pos in zip (frames, mouse_info):
+    x, y = pos
+    draw = ImageDraw.Draw(frame)    
+    draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline="blue", width=5)   
+    frame = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
     out.write(frame)
 
 # Liberar el objeto VideoWriter y cerrar la ventana
