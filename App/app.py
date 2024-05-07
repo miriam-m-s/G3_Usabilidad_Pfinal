@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import sys
 sys.path.append('./GazeTracking-master/')
+sys.path.append('./EyeTracker/')
 
 from App.Tabs import mainTab
 from eyeTracker import EyeTracker
