@@ -1,3 +1,6 @@
+import sys
+sys.path.append("./GazeTracking-master")
+
 import cv2
 from gaze_tracking import GazeTracking 
 
