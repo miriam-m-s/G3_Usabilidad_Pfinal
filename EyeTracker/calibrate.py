@@ -8,6 +8,12 @@ import numpy as np
 # SUP DCHA (x, 0) = 
 # INF DCHA (x, y) =
 
+class CalibrationOutput(Enum):
+    CALIBRATION_COMPLETED = 0
+    STILL_CALIBRATINH = 1
+    CORNER_COMPLETED = 2
+
+
 class ScreenPositions (Enum) :
     TOP_LEFT = 0
     TOP_RIGHT = 1
@@ -65,14 +71,27 @@ class CalibratorManager :
         self.calibrator = Calibrator()
 
     def calibrate_update(self, left_pupil_coords, right_pupil_coords) :
+
+        # Esperar a que indique que ya está mirando hacia esta posición
+        # if not usuario_mira_a_current_calibration :
+            # Si no le ha dado al espacio (o cualquier otro control)
+            # mostrar_mensaje_pulsa_espacio(esta_posicion)
+        
+        # else :
+            # Mostrar mensaje de la pantalla para siga mirando a la posición
+            # y el resto del código ...
         
         if (self.current_calibration >= len(self.positions)) : 
             return True # Calibración completada
+            # Mostrar mensaje de calibración terminada
 
         if not self.calibrator.collect_data(left_pupil_coords, right_pupil_coords) :
-
+            # Calibración completada para esta posición
             screen_position = self.positions[self.current_calibration]
             self.calibration_map[screen_position] = self.calibrator.process_data(screen_position)
             self.current_calibration += 1
 
-        return False # Sigue calibrando
+            # Cambiar mensaje de la pantalla para que mire a la siguiente posición
+            # mostrar_mensaje_pulsa_espacio(siguiente_posicion)
+
+        return CalibrationOutput.STILL_CALIBRATINH # Sigue calibrando
