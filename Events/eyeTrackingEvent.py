@@ -4,6 +4,6 @@ class EyeTrackingEvent:
         self.x=x
         self.y=y
         
-    def to_json(self):
+    def toJson(self):
         return f'{{\n "timestamp": {self.timestamp},\n "x": {self.x},\n "y": {self.y}\n}}'
     

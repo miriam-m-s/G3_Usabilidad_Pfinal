@@ -42,7 +42,13 @@ class App:
         self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker) 
         
         self.mainTab.setUp()
-
+        
+    def getWindowWidth(self): 
+        return self.root.winfo_width()
+    
+    def getWindowHeight(self):
+        return self.root.winfo_height()
+    
     def run(self):
         self.root.mainloop()
 
