@@ -28,19 +28,25 @@ class dataAnalyzer:
     startDataTime = 3
     endDataTime= 10
 
-    i = 0
     #Avanzar hasta la primera marca de tiempo que se necesita
-    for j in eyePosData:
-        if(eyePosData[j]['timestamp'] > (initTime + 3)):
+    for j in range(0, len(eyePosData)):
+        if(eyePosData[j]['timestamp'] >= (initTime + 3)):
             break
-        i += 1
 
+    print(j)
+    print(eyePosData[j]['timestamp'])
+    totalPositions= []
+    for k in range(j,len(eyePosData)):
+        if(eyePosData[k]['timestamp'] > (initTime + 100)):
+            break
+        print
+        totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
+
+    print(len(totalPositions))
     #guardar todas las posiciones x, y en un array
-    end = False
+
     
-    while not end:
+    # while not end:
 
-   # eyePositions = 
+    # eyePositions = 
 
-   
-#Paso el initialtime a segundos para saber cuantos se
