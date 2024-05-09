@@ -13,5 +13,6 @@ eventSender = EventSender(serializer, 5)  # Enviar eventos cada 5 segundos
 eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), x=100, y=200))
 eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), x=150, y=250))
 
+
 #Iniciar el envío de eventos en segundo plano
 eventSender.sendEvents()
