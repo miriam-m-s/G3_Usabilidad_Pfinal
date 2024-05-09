@@ -149,3 +149,18 @@ class CalibratorManager :
             # mostrar_mensaje_pulsa_espacio(siguiente_posicion)
 
         return CalibrationOutput.STILL_CALIBRATING # Sigue calibrando
+    
+    def getTopLeft(self):
+        return self.calibration_map[ScreenPositions.TOP_LEFT]
+    
+    def getTopRight(self):
+        return self.calibration_map[ScreenPositions.TOP_RIGHT]
+    
+    def getBottomLeft(self):
+        return self.calibration_map[ScreenPositions.BOTTOM_LEFT]
+    
+    def getBottomRight(self):
+        return self.calibration_map[ScreenPositions.BOTTOM_RIGHT]
+    
+    def getCenter(self):
+        return self.calibration_map[ScreenPositions.CENTER]

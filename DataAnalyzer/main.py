@@ -10,37 +10,31 @@ class dataAnalyzer:
     with open('prueba.json', 'r') as json_data:
         data = json.load(json_data)
     eyePosData = data["eye_positions"]
-    # while True:
-
-    #     firstDataTime = input("First data time: ")
-    #     lastDataTime = input ("Last data time: ")
-    #     try:
-    #         firstDataTime= int(firstDataTime)
-    #         lastDataTime= int(lastDataTime)
-    #         if(firstDataTime <= lastDataTime):
-    #             break
-    #         else:
-    #             print("The second number must be larger than the first one")
-    #     except ValueError:
-    #         print("Invalid data types")
+    
     initTime = eyePosData[0]['timestamp']
 
-    startDataTime = 3
-    endDataTime= 10
+    startDataTime = 0
+    endDataTime= len(eyePosData)
 
-    i = 0
     #Avanzar hasta la primera marca de tiempo que se necesita
-    for j in eyePosData:
-        if(eyePosData[j]['timestamp'] > (initTime + 3)):
+    for j in range(0, len(eyePosData)):
+        if(eyePosData[j]['timestamp'] >= (initTime + startDataTime)):
             break
-        i += 1
 
+    print(j)
+    print(eyePosData[j]['timestamp'])
+    totalPositions= []
+    for k in range(j,len(eyePosData)):
+        if(eyePosData[k]['timestamp'] > (initTime + endDataTime)):
+            break
+        print
+        totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
+
+    print(len(totalPositions))
     #guardar todas las posiciones x, y en un array
-    end = False
+
     
-    while not end:
+    # while not end:
 
-   # eyePositions = 
+    # eyePositions = 
 
-   
-#Paso el initialtime a segundos para saber cuantos se

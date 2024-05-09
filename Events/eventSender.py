@@ -9,20 +9,27 @@ class EventSender:
         if not os.path.exists(self.tracked_events_folder):
             os.makedirs(self.tracked_events_folder)
         
-    def add_event(self, event):
+    def addEvent(self, event):
         self.events.append(event)
 
-    def send_events(self):
+    def sendEvents(self):
         while True:
             time.sleep(self.interval)
-            self.save_events()
+            self.saveEvents()
 
-    def save_events(self):
+    def saveEvents(self):
         
-        filename = f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
+        filename = f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.getFileExtension()}"
         with open(filename, 'w') as file:
-            file.write(self.serializer.init_file_format())
+            file.write(self.serializer.initFileFormat())
             for event in self.events:
                 file.write(self.serializer.serialize(event))
-            file.write(self.serializer.end_file_format())
+            file.write(self.serializer.endFileFormat())
         self.events = []
+        
+    def normalizeEvents(self,coordX,coordY,topLeft, topRight, bottomLeft, bottomRight):
+        normX=  (coordX - topLeft[0]) / (topRight[0] - topLeft[0])
+        normY=  (coordY - topLeft[1]) / (bottomLeft[1] - topLeft[1])
+        
+        
+        
