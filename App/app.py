@@ -53,9 +53,15 @@ class App:
         self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.root, self.frame2, self.videoPlayer)
         
         self.mainTab.setUp()
-        self.videoPlayerTab.setUp()
-
-    def run(self):        
+        self.videoPlayerTab.setUp()        
+        
+    def getWindowWidth(self): 
+        return self.root.winfo_width()
+    
+    def getWindowHeight(self):
+        return self.root.winfo_height()
+    
+    def run(self):
         self.lastUpdateTime = 0
         self.root.mainloop()
 
