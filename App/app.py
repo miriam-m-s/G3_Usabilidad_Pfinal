@@ -9,10 +9,13 @@ from App.Tabs import videoPlayerTab
 from EyeTracker.eyeTracker import EyeTracker
 from ScreenRecorderTest.videoPlayer import VideoPlayer
 
+import time
+
 
 class App:
 
-    updateMS = 32 #miliseconds
+    cap = 1 / 10
+    capMS = round(cap * 1000)
 
     currentTab = None
     eyeTracker = None
@@ -23,7 +26,7 @@ class App:
         self.root.title("Eye Tracker")
         self.root.geometry("1152x648")
         #self.root.resizable(False, False)
-        self.root.after(self.updateMS, self.update_)
+        self.root.after(1000, self.__update)
         #sv_ttk.set_theme("dark")
 
         self.eyeTracker = EyeTracker()
@@ -47,12 +50,13 @@ class App:
         
         # Creamos las clases que representan cada pestaña de la App
         self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker) 
-        self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.frame2, self.videoPlayer)
+        self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.root, self.frame2, self.videoPlayer)
         
         self.mainTab.setUp()
         self.videoPlayerTab.setUp()
 
-    def run(self):
+    def run(self):        
+        self.lastUpdateTime = 0
         self.root.mainloop()
 
     def onTabChanged(self, event):
@@ -71,9 +75,17 @@ class App:
         
         #self.currentTab.onEntryTab()
     
-    def update_(self):
-        if self.currentTab == None:
-            return
+    def __update(self):
+        currentTime = time.time()
+        dt = currentTime - self.lastUpdateTime
+        self.lastUpdateTime = currentTime
 
-        self.currentTab.update()
-        self.root.after(self.updateMS, self.update_)
+        print(f"DT: {dt}")
+
+        if self.currentTab is not None:
+            self.currentTab.update(dt)
+
+        # waitTime = max(0, self.cap - dt)
+        # self.root.after(round(waitTime * 1000), self.__update)
+
+        self.root.after(self.capMS, self.__update)

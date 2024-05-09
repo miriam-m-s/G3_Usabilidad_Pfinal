@@ -22,7 +22,7 @@ class MainTab:
 
         return
     
-    def update(self):
+    def update(self, dt):
         if not self.playing:
             return
         
