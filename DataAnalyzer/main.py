@@ -31,10 +31,11 @@ class dataAnalyzer:
         totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
 
     print(len(totalPositions))
-    #guardar todas las posiciones x, y en un array
 
-    
-    # while not end:
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
-    # eyePositions = 
+
 
