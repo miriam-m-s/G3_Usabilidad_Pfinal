@@ -4,24 +4,27 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+import math 
 class dataAnalyzer:
     def createHeatMap(coords):
-        # Extraer las coordenadas x e y de la lista
-        x = [coord[0] for coord in coords]
-        y = [coord[1] for coord in coords]
-
-        # Crear un histograma 2D normalizado
-        heatmap, xedges, yedges = np.histogram2d(x, y, bins=50, density=True)
-
-        # Plotear el mapa de calor
-        plt.imshow(heatmap.T, origin='lower', extent=[min(x), max(x), min(y), max(y)], cmap='hot')
-        plt.colorbar(label='Densidad')
-        plt.xlabel('X')
-        plt.ylabel('Y')
-        plt.title('Mapa de Calor')
+        # dataframe para el mapa de calor
+        heatData = pd.DataFrame([[0]*10]*10)
+        print(heatData)
+        xCoord=0
+        yCoord=0
+       #recorro todo el array para parsear las posiciones a casillas del dataframe
+        for c in coords:
+            xCoord= math.trunc(c[0] * 10)
+            yCoord= math.trunc(c[1] * 10)
+            if(xCoord ==10):
+                xCoord = 1
+            if(yCoord == 10):
+                yCoord = 1    
+            heatData[xCoord][yCoord] = heatData[xCoord][yCoord] +1
+        print(heatData) 
+        plt.figure(figsize=(10,10))
+        sns.heatmap(heatData,cmap='coolwarm', annot=True,  square=True, linewidths=.5)
         plt.show()
-    
     # Cargar el JSON desde un archivo
     with open('prueba.json', 'r') as json_data:
         data = json.load(json_data)
@@ -46,7 +49,6 @@ class dataAnalyzer:
         print
         totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
     createHeatMap(totalPositions)
-    print(len(totalPositions))
 
 
 
