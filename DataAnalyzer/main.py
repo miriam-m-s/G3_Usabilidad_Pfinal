@@ -1,10 +1,26 @@
 import json
 import datetime
+import numpy as np
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
 
 class dataAnalyzer:
-    # def getTimeInSeconds(timestamp):
-    #     fecha = datetime.datetime.fromtimestamp(timestamp)
-    #     return fecha
+    def createHeatMap(coords):
+        # Extraer las coordenadas x e y de la lista
+        x = [coord[0] for coord in coords]
+        y = [coord[1] for coord in coords]
+
+        # Crear un histograma 2D normalizado
+        heatmap, xedges, yedges = np.histogram2d(x, y, bins=50, density=True)
+
+        # Plotear el mapa de calor
+        plt.imshow(heatmap.T, origin='lower', extent=[min(x), max(x), min(y), max(y)], cmap='hot')
+        plt.colorbar(label='Densidad')
+        plt.xlabel('X')
+        plt.ylabel('Y')
+        plt.title('Mapa de Calor')
+        plt.show()
     
     # Cargar el JSON desde un archivo
     with open('prueba.json', 'r') as json_data:
@@ -29,13 +45,9 @@ class dataAnalyzer:
             break
         print
         totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
-
+    createHeatMap(totalPositions)
     print(len(totalPositions))
 
-import numpy as np
-import pandas as pd
-import seaborn as sns
-import matplotlib.pyplot as plt
 
 
 
