@@ -96,11 +96,11 @@ class MainTab:
         self.app.set_fullscreen(True)
         self.calibration_running = True
 
-        self.app.root.after(1000, self.set_up_window_calibration)
+        self.app.root.after(400, self.set_up_window_calibration)
 
     def set_up_window_calibration(self):
-        w = self.tab.winfo_width()
-        h = self.tab.winfo_height()
+        w = self.app.root.winfo_screenwidth()
+        h = self.app.root.winfo_screenheight()
         self.canvas.config(width=w, height=h)
 
         self.corner_coords = self.calibrator_manager.get_corner_calibration_order_position()

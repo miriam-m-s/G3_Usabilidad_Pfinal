@@ -11,7 +11,6 @@ from ScreenRecorderTest.videoPlayer import VideoPlayer
 
 import time
 
-
 class App:
 
     cap = 1 / 10
@@ -28,7 +27,7 @@ class App:
         self.root = Tk()
         self.root.title("Eye Tracker")
         self.root.geometry(f"{self.init_window_width}x{self.init_window_height}")
-        
+        #print(f"Width: {self.root.winfo_screenwidth()}, Height: {self.root.winfo_height()}")
         #self.root.resizable(False, False)
         self.root.after(1000, self.__update)
         #sv_ttk.set_theme("dark")
@@ -44,7 +43,7 @@ class App:
         self.frame1 = ttk.Frame(self.root, padding = 0)
         self.frame2 = ttk.Frame(self.root, padding = 0)
 
-        # Agregar las pestañas al notebook
+        # Agregar las pestañas al notebookªª
         self.notebook.add(self.frame1, text="Main")
         self.notebook.add(self.frame2, text="Video Player")
 
