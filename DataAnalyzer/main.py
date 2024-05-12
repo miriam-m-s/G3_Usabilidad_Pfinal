@@ -19,9 +19,10 @@ class dataAnalyzer:
             if(xCoord ==10):
                 xCoord = 1
             if(yCoord == 10):
-                yCoord = 1    
+                yCoord = 1   
             heatData[xCoord][yCoord] = heatData[xCoord][yCoord] +1
         print(heatData) 
+        #Creación del heatmap
         plt.figure(figsize=(10,10))
         sns.heatmap(heatData,cmap='coolwarm', annot=True,  square=True, linewidths=.5)
         plt.show()
