@@ -28,12 +28,18 @@ class MainTab:
     def setUp(self):
         self.canvas = tk.Canvas(self.tab, width=1000, height=600)
         self.canvas.pack()
-        x = 90
+
+        self.play_button = ttk.Button(self.canvas, text="Play", command=self.play)
+        self.calibrate_button = ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration)
+        self.stop_button = ttk.Button(self.canvas, text="Stop", command=self.stop)
+        self.instructions_button = ttk.Button(self.canvas, text="Instructions", command=self.show_instructions)
+        
+        x = self.app.init_window_width * 0.45
         y = 10
-        ttk.Button(self.canvas, text="Play", command=self.play).place(x=x, y=y)
-        ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration).place(x=x, y=y + 30)
-        ttk.Button(self.canvas, text="Stop", command=self.stop).place(x=x, y=y + 60)
-        ttk.Button(self.canvas, text="Instructions", command=self.show_instructions).place(x=x, y = y + 90)
+        self.play_button.place(x=x, y=y)
+        self.calibrate_button.place(x=x, y=y + 30)
+        self.stop_button.place(x=x, y=y + 60)
+        self.instructions_button.place(x=x, y = y + 90)
         
         self.instructions = instructions.CalibrationInstructions()
         self.load_images()
@@ -82,9 +88,14 @@ class MainTab:
         if not self.playing:
             self.play()
 
+        self.play_button.place_forget()
+        self.instructions_button.place_forget()
+        self.calibrate_button.place_forget()
+
         self.calibrator_manager.reset()
         self.app.set_fullscreen(True)
         self.calibration_running = True
+
         self.app.root.after(1000, self.set_up_window_calibration)
 
     def set_up_window_calibration(self):
@@ -124,11 +135,16 @@ class MainTab:
 
     def shut_down_calibration(self):
         self.calibration_runninga = False
-        if self.corner_images == None:
-            return
-        
-        for img_id in self.corner_images:
-            self.canvas.delete(img_id)
+        if self.corner_images != None:
+            for img_id in self.corner_images:
+                self.canvas.delete(img_id)
+    
+        x = self.app.init_window_width * 0.45
+        y = 10
+        self.play_button.place(x=x, y=y)
+        self.calibrate_button.place(x=x, y=y + 30)
+        self.stop_button.place(x=x, y=y + 60)
+        self.instructions_button.place(x=x, y = y + 90)
     # MARK: UPDATE
 
     def update(self, dt):

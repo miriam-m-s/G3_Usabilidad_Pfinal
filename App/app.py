@@ -20,11 +20,14 @@ class App:
     currentTab = None
     eyeTracker = None
 
+    init_window_width = 1152
+    init_window_height = 648
+
     def init(self):
         #Creación de la aplicación raíz
         self.root = Tk()
         self.root.title("Eye Tracker")
-        self.root.geometry("1152x648")
+        self.root.geometry(f"{self.init_window_width}x{self.init_window_height}")
         
         #self.root.resizable(False, False)
         self.root.after(1000, self.__update)
