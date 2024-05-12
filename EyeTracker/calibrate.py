@@ -53,8 +53,14 @@ class Calibrator :
 
     def collect_data(self, left_pupil_coords, right_pupil_coords) :
 
-        mean_x = (left_pupil_coords[0] + right_pupil_coords[0]) / 2
+        # TRUCO PARA SABER SI LAS COORDENADAS DE MIRADA SON VÁLIDAS:
+        # Como la primera calibración es respecto al centro, una vez completada esta, podemos saber si el usuario está
+        # mirando a al esquina que corresponda comparándolo con las coordenadas del centro. Ej: Si es esquina sup. der.
+        # las coordenadas serán menores en eje x e y, si no, podemos asumir que está mirando a otro lado y no guardarlas
+        # esto se puede hacer mandando como parámetro de entrada una función de validación desde el Manager, que compruebe
+        # bajo que casos podemos aceptar datos, por ejemplo.
 
+        mean_x = (left_pupil_coords[0] + right_pupil_coords[0]) / 2
         mean_y = (left_pupil_coords[1] + right_pupil_coords[1]) / 2
 
         self.collected_data.append((mean_x, mean_y))
@@ -104,7 +110,7 @@ class CalibratorManager :
 
     current_calibration = 0
 
-    positions = [ScreenPositions.TOP_LEFT, ScreenPositions.TOP_RIGHT, ScreenPositions.BOTTOM_LEFT, ScreenPositions.BOTTOM_RIGHT, ScreenPositions.CENTER]
+    positions = [ScreenPositions.CENTER, ScreenPositions.TOP_LEFT, ScreenPositions.TOP_RIGHT, ScreenPositions.BOTTOM_LEFT, ScreenPositions.BOTTOM_RIGHT]
 
 
     def __init__(self):

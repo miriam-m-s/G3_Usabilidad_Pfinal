@@ -5,6 +5,7 @@ import cv2
 
 from PIL import Image, ImageTk
 from EyeTracker import calibrate
+from App.AppState import instructions
 
 class MainTab:
 
@@ -27,10 +28,14 @@ class MainTab:
     def setUp(self):
         self.canvas = tk.Canvas(self.tab, width=1000, height=600)
         self.canvas.pack()
-        ttk.Button(self.canvas, text="Play", command=self.play).place(x=0, y=0)
-        ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration).place(x=0, y=20)
-        ttk.Button(self.canvas, text="Stop", command=self.stop).place(x=0, y=40)
+        x = 90
+        y = 10
+        ttk.Button(self.canvas, text="Play", command=self.play).place(x=x, y=y)
+        ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration).place(x=x, y=y + 30)
+        ttk.Button(self.canvas, text="Stop", command=self.stop).place(x=x, y=y + 60)
+        ttk.Button(self.canvas, text="Instructions", command=self.show_instructions).place(x=x, y = y + 90)
         
+        self.instructions = instructions.CalibrationInstructions()
         self.load_images()
 
         self.calibrator_manager = calibrate.CalibratorManager()
@@ -50,6 +55,10 @@ class MainTab:
         self.green_circle_photo = ImageTk.PhotoImage(resized_green)
         self.red_circle_photo = ImageTk.PhotoImage(resized_red)
         
+    # MARK: BUTTON CALLBACKS
+    def show_instructions(self):
+        self.instructions.show_instructions_popup(self.tab)
+
     def play(self):
         self.playing = True
 
@@ -84,8 +93,7 @@ class MainTab:
         self.canvas.config(width=w, height=h)
 
         self.corner_coords = self.calibrator_manager.get_corner_calibration_order_position()
-        self.calibrator_manager.get_current_relative_corner()
-        
+        self.calibrator_manager.get_current_relative_corner()      
    
         self.corner_images = []
         for corner in self.corner_coords:
@@ -94,6 +102,7 @@ class MainTab:
             #self.canvas.create_image(0, 0, anchor="nw", image=self.background_img)
             self.corner_images.append(self.canvas.create_image(x, y, anchor="center",image = self.gray_circle_photo))
 
+        self.update_corner_view()
         
     def on_calibration_completed(self):
         self.app.set_fullscreen(False)
@@ -101,8 +110,17 @@ class MainTab:
         print("Calibración completa")
         self.shut_down_calibration()
 
-    def on_corner_completed(self):
-        print("Corner completed")
+    def update_corner_view(self):
+        current_corner = self.calibrator_manager.current_calibration
+
+        # Ponemos en verde el punto de control ya analizado
+        if current_corner > 0:
+            img_id = self.corner_images[current_corner - 1]
+            self.canvas.itemconfig(img_id, image=self.green_circle_photo)
+
+        if current_corner <= len(self.corner_images) - 1:
+            img_id = self.corner_images[current_corner]
+            self.canvas.itemconfig(img_id, image=self.red_circle_photo)
 
     def shut_down_calibration(self):
         self.calibration_runninga = False
@@ -114,12 +132,12 @@ class MainTab:
     # MARK: UPDATE
 
     def update(self, dt):
-        if not self.playing:
+        if self.playing == False: #or self.calibration_running para no mostrarlo en la calibración. Hay que borrar el id de la imagen también
             return
         
         frame, left_pupil, right_pupil = self.eyeTracker.getFrame()
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-        self.cam_img_id = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+        self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)
         
         if self.calibration_running:
             self.update_calibration_(left_pupil, right_pupil)
@@ -134,4 +152,4 @@ class MainTab:
         if calibration_otuput == calibrate.CalibrationOutput.CALIBRATION_COMPLETED:
             self.on_calibration_completed()
         elif calibration_otuput == calibrate.CalibrationOutput.CORNER_COMPLETED:
-            self.on_corner_completed()        
+            self.update_corner_view()        
