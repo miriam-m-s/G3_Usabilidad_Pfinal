@@ -25,6 +25,7 @@ class App:
         self.root = Tk()
         self.root.title("Eye Tracker")
         self.root.geometry("1152x648")
+        
         #self.root.resizable(False, False)
         self.root.after(1000, self.__update)
         #sv_ttk.set_theme("dark")
@@ -37,8 +38,8 @@ class App:
         self.notebook = ttk.Notebook(self.root)
 
         #Crear pestañas
-        self.frame1 = ttk.Frame(self.root, padding = 20)
-        self.frame2 = ttk.Frame(self.root, padding = 20)
+        self.frame1 = ttk.Frame(self.root, padding = 0)
+        self.frame2 = ttk.Frame(self.root, padding = 0)
 
         # Agregar las pestañas al notebook
         self.notebook.add(self.frame1, text="Main")
@@ -49,12 +50,16 @@ class App:
         self.notebook.bind("<<NotebookTabChanged>>", self.onTabChanged)
         
         # Creamos las clases que representan cada pestaña de la App
-        self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker) 
+        self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker, self) 
         self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.root, self.frame2, self.videoPlayer)
         
         self.mainTab.setUp()
         self.videoPlayerTab.setUp()        
-        
+
+    def set_fullscreen(self, fullscren):
+        self.root.attributes("-fullscreen", fullscren)
+        self.fullscreen = fullscren
+
     def getWindowWidth(self): 
         return self.root.winfo_width()
     
@@ -85,8 +90,6 @@ class App:
         currentTime = time.time()
         dt = currentTime - self.lastUpdateTime
         self.lastUpdateTime = currentTime
-
-        print(f"DT: {dt}")
 
         if self.currentTab is not None:
             self.currentTab.update(dt)

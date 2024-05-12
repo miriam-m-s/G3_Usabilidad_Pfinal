@@ -18,12 +18,8 @@ import numpy as np
 class CalibrationOutput(Enum):
 
     CALIBRATION_COMPLETED = 0
-
     STILL_CALIBRATING = 1
-
     CORNER_COMPLETED = 2
-
-
 
 class ScreenPositions (Enum) :
 
@@ -50,48 +46,49 @@ class Calibrator :
 
     current_iteration = 0
 
+    def reset(self):
+        self.collected_data = []
+        self.current_iteration = 0
+        print("Reset")
 
     def collect_data(self, left_pupil_coords, right_pupil_coords) :
-
 
         mean_x = (left_pupil_coords[0] + right_pupil_coords[0]) / 2
 
         mean_y = (left_pupil_coords[1] + right_pupil_coords[1]) / 2
 
-
-        self.collected_data[self.current_iteration] = (mean_x, mean_y)
+        self.collected_data.append((mean_x, mean_y))
 
 
         self.current_iteration += 1
-
 
         return (self.current_iteration < self.data_to_collect)
 
 
     def process_data(self, position) :
 
-
         array_np = np.array(self.collected_data)
-
 
         mean_x = np.mean(array_np[:, 0])
 
         mean_y = np.mean(array_np[:, 1])
 
+        self.reset()
         
-
-
-        self.collected_data = []
-
-        self.current_iteration = 0
-
-
         return (mean_x, mean_y)
 
 
 
 class CalibratorManager :
 
+    # Posición de cada esquina 0-1
+    corner_relative_positions = {
+                        ScreenPositions.TOP_LEFT      : (0,0),
+                        ScreenPositions.TOP_RIGHT     : (1,0),
+                        ScreenPositions.BOTTOM_LEFT   : (0,1),
+                        ScreenPositions.BOTTOM_RIGHT  : (1,1),
+                        ScreenPositions.CENTER        : (0.5, 0.5)
+                        }
 
     calibration_map = {ScreenPositions.TOP_LEFT : (0,0),
 
@@ -103,7 +100,6 @@ class CalibratorManager :
 
                         ScreenPositions.CENTER : (0,0)}
 
-
     calibrator = None
 
     current_calibration = 0
@@ -112,9 +108,16 @@ class CalibratorManager :
 
 
     def __init__(self):
-
         self.calibrator = Calibrator()
 
+    def reset(self):
+        self.current_calibration = 0
+        self.calibration_map = {ScreenPositions.TOP_LEFT : (0,0),
+                        ScreenPositions.TOP_RIGHT : (0,0),
+                        ScreenPositions.BOTTOM_LEFT : (0,0),
+                        ScreenPositions.BOTTOM_RIGHT : (0,0),
+                        ScreenPositions.CENTER : (0,0)}
+        self.calibrator.reset()
 
     def calibrate_update(self, left_pupil_coords, right_pupil_coords) :
 
@@ -136,7 +139,7 @@ class CalibratorManager :
         
 
         if (self.current_calibration >= len(self.positions)) : 
-            returnationOuttionOutput.CALIBRATION_COMPLETED # Calibración completada
+            return CalibrationOutput.CALIBRATION_COMPLETED # Calibración completada
             # Mostrar mensaje de calibración terminada
 
         if not self.calibrator.collect_data(left_pupil_coords, right_pupil_coords) :
@@ -163,4 +166,15 @@ class CalibratorManager :
         return self.calibration_map[ScreenPositions.BOTTOM_RIGHT]
     
     def getCenter(self):
-        return self.calibration_map[ScreenPositions.CENTER]
+        return self.calibration_map[ScreenPositions.CENTER] 
+    
+    def get_calibration_map(self):
+        return self.calibration_map.copy()  
+    
+    def get_current_relative_corner(self):
+        currentScreenCorner = ScreenPositions(self.positions[self.current_calibration])
+        return self.corner_relative_positions[currentScreenCorner]
+    
+    def get_corner_calibration_order_position(self):
+        return [self.corner_relative_positions[ScreenPositions(position)] for position in self.positions]
+    

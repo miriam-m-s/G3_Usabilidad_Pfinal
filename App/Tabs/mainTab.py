@@ -10,34 +10,46 @@ class MainTab:
 
     cam_img_id = None 
     calibration_running = None
+    corner_images = None
 
-    def __init__(self, tab, eyeTracker):
+    gray_circle_path = "./App/Images/grayCircle.png"
+    green_circle_path = "./App/Images/greenCircle.png"
+    red_circle_path = "./App/Images/redCircle.png"
+
+    circle_width = 90
+
+    def __init__(self, tab, eyeTracker, app):
         self.tab = tab
         self.eyeTracker = eyeTracker
-        self.playing = False 
+        self.playing = False
+        self.app = app 
  
     def setUp(self):
-        ttk.Button(self.tab, text="Play", command=self.play).pack()
-        ttk.Button(self.tab, text="Calibrate", command = self.update_calibration_).pack()
-        ttk.Button(self.tab, text="Stop", command=self.stop).pack()
-
-        self.calibrator_manager = calibrate.CalibratorManager()
-        
         self.canvas = tk.Canvas(self.tab, width=1000, height=600)
         self.canvas.pack()
-    
-    def update(self, dt):
-        if not self.playing:
-            return
+        ttk.Button(self.canvas, text="Play", command=self.play).place(x=0, y=0)
+        ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration).place(x=0, y=20)
+        ttk.Button(self.canvas, text="Stop", command=self.stop).place(x=0, y=40)
         
-        frame = self.eyeTracker.getFrame()
-        self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-        self.cam_img_id = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-        
-        if self.calibration_running:
-            self.update_calibration_()
+        self.load_images()
 
-    
+        self.calibrator_manager = calibrate.CalibratorManager()
+
+    def load_images(self):
+        gray_image = Image.open(self.gray_circle_path)
+        red_image = Image.open(self.red_circle_path)
+        green_image = Image.open(self.green_circle_path)
+
+        w = self.circle_width
+
+        resized_gray = gray_image.resize((w, w), Image.LANCZOS)
+        resized_red = red_image.resize((w, w), Image.LANCZOS)
+        resized_green = green_image.resize((w, w), Image.LANCZOS)
+
+        self.gray_circle_photo = ImageTk.PhotoImage(resized_gray)
+        self.green_circle_photo = ImageTk.PhotoImage(resized_green)
+        self.red_circle_photo = ImageTk.PhotoImage(resized_red)
+        
     def play(self):
         self.playing = True
 
@@ -45,8 +57,11 @@ class MainTab:
         if not self.playing:
             return
         
-        self.calibration_running = False
+        if self.calibration_running:
+            self.shut_down_calibration()
+
         self.playing = False
+        self.app.set_fullscreen(False)
 
         if self.cam_img_id != None:
             self.canvas.delete(self.cam_img_id)
@@ -58,15 +73,65 @@ class MainTab:
         if not self.playing:
             self.play()
 
-    def update_calibration_(self):
-        if not self.calibration_running:
+        self.calibrator_manager.reset()
+        self.app.set_fullscreen(True)
+        self.calibration_running = True
+        self.app.root.after(1000, self.set_up_window_calibration)
+
+    def set_up_window_calibration(self):
+        w = self.tab.winfo_width()
+        h = self.tab.winfo_height()
+        self.canvas.config(width=w, height=h)
+
+        self.corner_coords = self.calibrator_manager.get_corner_calibration_order_position()
+        self.calibrator_manager.get_current_relative_corner()
+        
+   
+        self.corner_images = []
+        for corner in self.corner_coords:
+            x = corner[0] * w
+            y = corner[1] * h
+            #self.canvas.create_image(0, 0, anchor="nw", image=self.background_img)
+            self.corner_images.append(self.canvas.create_image(x, y, anchor="center",image = self.gray_circle_photo))
+
+        
+    def on_calibration_completed(self):
+        self.app.set_fullscreen(False)
+        self.calibrator_manager.get_calibration_map()
+        print("Calibración completa")
+        self.shut_down_calibration()
+
+    def on_corner_completed(self):
+        print("Corner completed")
+
+    def shut_down_calibration(self):
+        self.calibration_runninga = False
+        if self.corner_images == None:
             return
         
-        calibration_otuput = self.calibrator_manager.calibrate_update()
-        
-        
-        
+        for img_id in self.corner_images:
+            self.canvas.delete(img_id)
+    # MARK: UPDATE
 
-
-
+    def update(self, dt):
+        if not self.playing:
+            return
         
+        frame, left_pupil, right_pupil = self.eyeTracker.getFrame()
+        self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+        self.cam_img_id = self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
+        
+        if self.calibration_running:
+            self.update_calibration_(left_pupil, right_pupil)
+
+    def update_calibration_(self, left_pupil, right_pupil):
+        if self.calibration_running == False or left_pupil is None or right_pupil is None:
+            return
+
+        print(f"Pupila izq: {left_pupil}")
+        calibration_otuput = self.calibrator_manager.calibrate_update(left_pupil_coords=left_pupil, right_pupil_coords=right_pupil)
+
+        if calibration_otuput == calibrate.CalibrationOutput.CALIBRATION_COMPLETED:
+            self.on_calibration_completed()
+        elif calibration_otuput == calibrate.CalibrationOutput.CORNER_COMPLETED:
+            self.on_corner_completed()        
