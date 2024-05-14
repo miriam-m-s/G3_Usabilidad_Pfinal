@@ -15,6 +15,7 @@ class VideoPlayer:
         self.nFrames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
         self.dt = 1 / self.video.get(cv2.CAP_PROP_FPS)
         self.duration = self.dt * self.nFrames
+        self.currentFrame = 0
 
         self.frames = []
         for _ in range(self.nFrames):         
@@ -26,4 +27,9 @@ class VideoPlayer:
         print(f'Frames totales {self.nFrames}')
 
     def getFrame(self, time):
-        return self.frames[min(int(time / self.dt),  self.nFrames)]
+        self.currentFrame = int(time / self.dt)      
+        if self.currentFrame < self.nFrames:
+            return True, self.frames[self.currentFrame]
+        else:
+            self.currentFrame = self.nFrames - 1
+            return False, self.frames[self.currentFrame]
