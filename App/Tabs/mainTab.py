@@ -146,7 +146,7 @@ class MainTab:
             self.canvas.itemconfig(img_id, image=self.red_circle_photo)
 
     def shut_down_calibration(self):
-        self.calibration_runninga = False
+        self.calibration_running = False
         if self.corner_images != None:
             for img_id in self.corner_images:
                 self.canvas.delete(img_id)
