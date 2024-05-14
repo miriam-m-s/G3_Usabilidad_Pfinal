@@ -25,17 +25,13 @@ class EventSender:
         
     def addEvent(self, event):
         
-        normLeftPupilX, normLeftPupilY = self.normalizeEvents(event.leftPupilX, event.leftPupilY)
-        normRightPupilX, normRightPupilY = self.normalizeEvents(event.rightPupilX, event.rightPupilY)
-        
-        event.setLeftPupilCoords(normLeftPupilX, normLeftPupilY)
-        event.setRightPupilCoords(normRightPupilX, normRightPupilY)
+        normX, normY = self.normalizeEvents(event.x, event.y)
+        event.setCoords(normX, normY)
         
         self.events.append(event)
 
         if time.time() - self.last_save_time >= self.interval:
             self.saveEvents()
-            print("Eventos guardados")
             self.last_save_time = time.time()
 
     def saveEvents(self):

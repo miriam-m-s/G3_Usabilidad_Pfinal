@@ -167,9 +167,11 @@ class MainTab:
         
         #TODO: enviar eventos de seguimiento ocular
         if left_pupil is not None and right_pupil is not None:
-            self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), leftPupilX=left_pupil[0], 
-                                                       leftPupilY=left_pupil[1],rightPupilX=right_pupil[0], rightPupilY=right_pupil[1]))
-            
+            #todo: media x e y de las pupilas
+            mean_x = (left_pupil[0] + right_pupil[0]) / 2
+            mean_y = (left_pupil[1] + right_pupil[1]) / 2
+            self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(),x=mean_x,y=mean_y))
+
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)
