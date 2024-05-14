@@ -164,11 +164,12 @@ class MainTab:
             return
         
         frame, left_pupil, right_pupil = self.eyeTracker.getFrame()
-        print(f"izq: {left_pupil}")
+        
         #TODO: enviar eventos de seguimiento ocular
         if left_pupil is not None and right_pupil is not None:
             self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), leftPupilX=left_pupil[0], 
                                                        leftPupilY=left_pupil[1],rightPupilX=right_pupil[0], rightPupilY=right_pupil[1]))
+            
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)

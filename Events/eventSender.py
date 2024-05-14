@@ -15,6 +15,8 @@ class EventSender:
         if not os.path.exists(self.tracked_events_folder):
             os.makedirs(self.tracked_events_folder)
             
+        self.last_save_time = time.time()
+            
     def setCalibrationPoints(self, topLeft, topRight, bottomLeft, bottomRight):
         self.topLeft = topLeft
         self.topRight = topRight
@@ -22,7 +24,7 @@ class EventSender:
         self.bottomRight = bottomRight
         
     def addEvent(self, event):
-        #TODO: normalizar eventos aqui
+        
         normLeftPupilX, normLeftPupilY = self.normalizeEvents(event.leftPupilX, event.leftPupilY)
         normRightPupilX, normRightPupilY = self.normalizeEvents(event.rightPupilX, event.rightPupilY)
         
@@ -31,10 +33,10 @@ class EventSender:
         
         self.events.append(event)
 
-    def sendEvents(self):
-        while True:
-            time.sleep(self.interval)            
+        if time.time() - self.last_save_time >= self.interval:
             self.saveEvents()
+            print("Eventos guardados")
+            self.last_save_time = time.time()
 
     def saveEvents(self):
         
@@ -45,11 +47,20 @@ class EventSender:
                 file.write(self.serializer.serialize(event))
             file.write(self.serializer.endFileFormat())
         self.events = []
+    
         
     def normalizeEvents(self,coordX,coordY):
-        normX=  (coordX - self.topLeft[0]) / (self.topRight[0] - self.topLeft[0])
-        normY=  (coordY - self.topLeft[1]) / (self.bottomLeft[1] - self.topLeft[1])
-        return normX,normY
+        if self.topRight[0] - self.topLeft[0] == 0:
+            normX = 0
+        else:
+            normX = (coordX - self.topLeft[0]) / (self.topRight[0] - self.topLeft[0])
+
+        if self.bottomLeft[1] - self.topLeft[1] == 0:
+            normY = 0
+        else:
+            normY = (coordY - self.topLeft[1]) / (self.bottomLeft[1] - self.topLeft[1])
+
+        return normX, normY
         
         
         
