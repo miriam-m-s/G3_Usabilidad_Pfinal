@@ -22,6 +22,10 @@ class EventSender:
         self.topRight = topRight
         self.bottomLeft = bottomLeft
         self.bottomRight = bottomRight
+        print(f"TopLeft: {self.topLeft}")
+        print(f"TopRight: {self.topRight}")
+        print(f"BottomLeft: {self.bottomLeft}")
+        print(f"BottomRight: {self.bottomRight}")
         
     def addEvent(self, event):
         
@@ -46,6 +50,8 @@ class EventSender:
     
         
     def normalizeEvents(self,coordX,coordY):
+
+        
         if self.topRight[0] - self.topLeft[0] == 0:
             normX = 0
         else:
@@ -56,6 +62,12 @@ class EventSender:
         else:
             normY = (coordY - self.topLeft[1]) / (self.bottomLeft[1] - self.topLeft[1])
 
+        print(f"CoordX: {coordX}")
+        print(f"CoordY: {coordY}")
+        print(f"NormX: {normX}")
+        print(f"NormY: {normY}")
+        
+        
         return normX, normY
         
         
