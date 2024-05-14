@@ -1,13 +1,20 @@
 class EyeTrackingEvent:
-    def __init__(self, timestamp,x,y):
+    def __init__(self, timestamp,leftPupilX,leftPupilY,rightPupilX,rightPupilY):
         self.timestamp = timestamp
-        self.x=x
-        self.y=y
+        
+        self.leftPupilX=leftPupilX
+        self.leftPupilY=leftPupilY
+        
+        self.rightPupilX=rightPupilX
+        self.rightPupilY=rightPupilY
         
     def toJson(self):
-        return f'{{\n "timestamp": {self.timestamp},\n "x": {self.x},\n "y": {self.y}\n}}'
+        return f'{{\n "timestamp": {self.timestamp},\n "leftPupilX": {self.leftPupilX},\n "leftPupilY": {self.leftPupilY},\n "rightPupilX": {self.rightPupilX},\n "rightPupilY": {self.rightPupilY}\n}}'
     
-    def setCoords(self,x,y):
-        self.x=x
-        self.y=y
-    
+    def setLeftPupilCoords(self,leftPupilX,leftPupilY):
+        self.leftPupilX=leftPupilX
+        self.leftPupilY=leftPupilY
+
+    def setRightPupilCoords(self,rightPupilX,rightPupilY):
+        self.rightPupilX=rightPupilX
+        self.rightPupilY=rightPupilY

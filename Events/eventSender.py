@@ -14,10 +14,21 @@ class EventSender:
         self.tracked_events_folder = "TrackedEvents"
         if not os.path.exists(self.tracked_events_folder):
             os.makedirs(self.tracked_events_folder)
+            
+    def setCalibrationPoints(self, topLeft, topRight, bottomLeft, bottomRight):
+        self.topLeft = topLeft
+        self.topRight = topRight
+        self.bottomLeft = bottomLeft
+        self.bottomRight = bottomRight
         
     def addEvent(self, event):
         #TODO: normalizar eventos aqui
-        event.setCoords(self.normalizeEvents(event.x,event.y,self.topLeft, self.topRight, self.bottomLeft, self.bottomRight))
+        normLeftPupilX, normLeftPupilY = self.normalizeEvents(event.leftPupilX, event.leftPupilY)
+        normRightPupilX, normRightPupilY = self.normalizeEvents(event.rightPupilX, event.rightPupilY)
+        
+        event.setLeftPupilCoords(normLeftPupilX, normLeftPupilY)
+        event.setRightPupilCoords(normRightPupilX, normRightPupilY)
+        
         self.events.append(event)
 
     def sendEvents(self):

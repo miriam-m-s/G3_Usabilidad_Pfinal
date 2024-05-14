@@ -7,6 +7,11 @@ from PIL import Image, ImageTk
 from EyeTracker import calibrate
 from App.AppState import instructions
 
+import time
+from Events.eventSender import EventSender
+from Events.jsonSerializer import JsonSerializer
+from Events.eyeTrackingEvent import EyeTrackingEvent
+
 class MainTab:
 
     cam_img_id = None 
@@ -45,7 +50,11 @@ class MainTab:
         self.load_images()
 
         self.calibrator_manager = calibrate.CalibratorManager()
-
+        
+        #Creacion del EventSender y JSONSerializer
+        self.serializer = JsonSerializer()
+        self.eventSender = EventSender(self.serializer, 5)  #Enviar eventos cada 5 segundos
+        
     def load_images(self):
         gray_image = Image.open(self.gray_circle_path)
         red_image = Image.open(self.red_circle_path)
@@ -152,6 +161,10 @@ class MainTab:
             return
         
         frame, left_pupil, right_pupil = self.eyeTracker.getFrame()
+        #TODO: enviar eventos de seguimiento ocular
+        #self.app.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), leftPupilX=left_pupil[0], 
+        #                                               leftPupilY=left_pupil[1],rightPupilX=right_pupil[0], rightPupilY=right_pupil[1]))
+        
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)
         
