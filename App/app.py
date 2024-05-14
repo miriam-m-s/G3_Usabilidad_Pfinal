@@ -97,11 +97,11 @@ class App:
             self.currentTab.update(dt)
 
         # Hace la resta para esperarse
-        waitTime = max(0, self.cap - dt)
-        self.root.after(round(waitTime * 1000), self.__update)
+        # waitTime = max(0, self.cap - dt)
+        # self.root.after(round(waitTime * 1000), self.__update)
 
         # Se espera siempre
-        # self.root.after(self.capMS, self.__update)
+        self.root.after(self.capMS, self.__update)
 
         # FPS máximos
         # self.root.after(10, self.__update)
