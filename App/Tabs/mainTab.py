@@ -53,7 +53,8 @@ class MainTab:
         
         #Creacion del EventSender y JSONSerializer
         self.serializer = JsonSerializer()
-        self.eventSender = EventSender(self.serializer, 5)  #Enviar eventos cada 5 segundos
+        self.eventSender = EventSender(self.serializer, 5, self.calibrator_manager.getTopLeft(), self.calibrator_manager.getTopRight(),
+                                       self.calibrator_manager.getBottomLeft(), self.calibrator_manager.getBottomRight())  #Enviar eventos cada 5 segundos
         
     def load_images(self):
         gray_image = Image.open(self.gray_circle_path)
@@ -129,6 +130,8 @@ class MainTab:
         self.calibrator_manager.get_calibration_map()
         print("Calibración completa")
         self.shut_down_calibration()
+        self.eventSender.setCalibrationPoints(self.calibrator_manager.getTopLeft(), self.calibrator_manager.getTopRight(),
+                                             self.calibrator_manager.getBottomLeft(), self.calibrator_manager.getBottomRight())
 
     def update_corner_view(self):
         current_corner = self.calibrator_manager.current_calibration
@@ -161,9 +164,11 @@ class MainTab:
             return
         
         frame, left_pupil, right_pupil = self.eyeTracker.getFrame()
+        print(f"izq: {left_pupil}")
         #TODO: enviar eventos de seguimiento ocular
-        #self.app.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), leftPupilX=left_pupil[0], 
-        #                                               leftPupilY=left_pupil[1],rightPupilX=right_pupil[0], rightPupilY=right_pupil[1]))
+        if left_pupil is not None and right_pupil is not None:
+            self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(), leftPupilX=left_pupil[0], 
+                                                       leftPupilY=left_pupil[1],rightPupilX=right_pupil[0], rightPupilY=right_pupil[1]))
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)
