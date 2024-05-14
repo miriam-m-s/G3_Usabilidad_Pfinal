@@ -3,21 +3,27 @@ import cv2
 class VideoPlayer:
 
     def __init__(self, path):
-        self.cap = cv2.VideoCapture(path)
+        self.video = cv2.VideoCapture(path)
 
-        if not self.cap.isOpened():
+        if not self.video.isOpened():
             print("Error al abrir el archivo de vídeo")
-        else:
-            self.width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-            self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+            return
+        
+        self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
+        self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-    def getFrame(self):
+        self.nFrames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
+        self.dt = 1 / self.video.get(cv2.CAP_PROP_FPS)
+        self.duration = self.dt * self.nFrames
 
-        # Lee un fotograma del archivo de vídeo
-        ret, frame = self.cap.read()
+        self.frames = []
+        for _ in range(self.nFrames):         
+            self.frames.append(self.video.read()[1])
+        self.frames.append(None)
 
-        # Verifica si se pudo leer el fotograma
-        if not ret:
-            print("Error al leer fotograma")
+        print(f'Duración del video: {self.duration}')
+        print(f'FPS: {int(self.video.get(cv2.CAP_PROP_FPS))}')
+        print(f'Frames totales {self.nFrames}')
 
-        return frame
+    def getFrame(self, time):
+        return self.frames[min(int(time / self.dt),  self.nFrames)]

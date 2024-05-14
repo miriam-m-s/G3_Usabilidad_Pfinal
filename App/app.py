@@ -13,7 +13,7 @@ import time
 
 class App:
 
-    cap = 1 / 10
+    cap = 1 / 60
     capMS = round(cap * 1000)
 
     currentTab = None
@@ -96,7 +96,12 @@ class App:
         if self.currentTab is not None:
             self.currentTab.update(dt)
 
-        # waitTime = max(0, self.cap - dt)
-        # self.root.after(round(waitTime * 1000), self.__update)
+        # Hace la resta para esperarse
+        waitTime = max(0, self.cap - dt)
+        self.root.after(round(waitTime * 1000), self.__update)
 
-        self.root.after(self.capMS, self.__update)
+        # Se espera siempre
+        # self.root.after(self.capMS, self.__update)
+
+        # FPS máximos
+        # self.root.after(10, self.__update)
