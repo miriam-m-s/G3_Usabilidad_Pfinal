@@ -3,6 +3,7 @@ from tkinter import ttk
 import tkinter as tk
 from tkinter import filedialog
 import cv2
+from tktooltip import ToolTip
 from PIL import Image, ImageTk
 from App.Frames import slicer
 from ScreenRecorderTest.videoPlayer import VideoPlayer
@@ -81,9 +82,11 @@ class VideoPlayerTab(Tab):
 
         self.videoTimeLabel = tk.Label(video_controller_frame, text="00:00:000")
         self.videoTimeLabel.grid(row=0, column=2, sticky="e")
+        ToolTip(self.videoTimeLabel, msg="Tiempo de vídeo", delay=0.5)
 
         self.videoFrameLabel = tk.Label(video_controller_frame, text="00000000")
         self.videoFrameLabel.grid(row=0, column=0, sticky="w")  
+        ToolTip(self.videoFrameLabel, msg="Fotograma", delay=0.5)
 
         self.slicer_frame = tk.Frame(self.tab)
         self.slicer_frame.grid(row=1, column=1, sticky="n")

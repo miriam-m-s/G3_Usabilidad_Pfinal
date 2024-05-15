@@ -18,8 +18,8 @@ class App:
     currentTab = None
     eyeTracker = None
 
-    init_window_width = 1152
-    init_window_height = 648
+    init_window_width = 1200
+    init_window_height = 650
 
     def init(self):
         #Creación de la aplicación raíz

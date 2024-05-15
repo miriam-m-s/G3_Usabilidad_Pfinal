@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
+from tktooltip import ToolTip
 
 class Slicer:
 
@@ -26,6 +27,8 @@ class Slicer:
 
 class Slice:
 
+    tooltip_delay = 0.5
+
     def __init__(self, tab, frame, text, time):
 
         self.tab = tab
@@ -35,17 +38,28 @@ class Slice:
         top_frame.grid(row=0, column=0, sticky="w")
 
         button_size = 3
-        ttk.Button(top_frame, text="C", width=button_size, command=self.__copy).pack(side=tk.LEFT)
-        ttk.Button(top_frame, text="P", width=button_size, command=self.__paste).pack(side=tk.LEFT)
+        buttonC = ttk.Button(top_frame, text="C", width=button_size, command=self.__copy)
+        buttonC.pack(side=tk.LEFT)
+        buttonP = ttk.Button(top_frame, text="P", width=button_size, command=self.__paste)
+        buttonP.pack(side=tk.LEFT)
         tk.Label(top_frame, text=text).pack(side=tk.LEFT)
 
         bottom_frame = tk.Frame(frame)
         bottom_frame.grid(row=1, column=0, sticky="w")
 
-        ttk.Button(bottom_frame, text="V", width=button_size, command=self.__videoTime).pack(side=tk.LEFT)
-        ttk.Button(bottom_frame, text="T", width=button_size, command=self.__saveTime).pack(side=tk.LEFT)
+        buttonV = ttk.Button(bottom_frame, text="V", width=button_size, command=self.__videoTime)
+        buttonV.pack(side=tk.LEFT)
+        buttonT = ttk.Button(bottom_frame, text="T", width=button_size, command=self.__saveTime)
+        buttonT.pack(side=tk.LEFT)
         self.label = tk.Label(bottom_frame, text=self.tab.MMMSSMMM(self.time))
         self.label.pack(side=tk.LEFT)
+
+        ToolTip(buttonC, msg = "Copiar tiempo", delay = self.tooltip_delay)
+        ToolTip(buttonP, msg = "Pegar tiempo", delay = self.tooltip_delay)
+        ToolTip(buttonV, msg = "Mueve el vídeo al tiempo del fragmento", delay = self.tooltip_delay)
+        ToolTip(buttonT, msg = "Copia al fragmento el tiempo de vídeo actual", delay = self.tooltip_delay)
+
+
 
     def __copy(self):
         self.tab.clipboard = self.time
