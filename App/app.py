@@ -7,7 +7,6 @@ sys.path.append('./EyeTracker/')
 from App.Tabs import mainTab
 from App.Tabs import videoPlayerTab
 from EyeTracker.eyeTracker import EyeTracker
-from ScreenRecorderTest.videoPlayer import VideoPlayer
 
 import time
 
@@ -34,7 +33,6 @@ class App:
 
         self.eyeTracker = EyeTracker()
         self.eyeTracker.setUp()
-        self.videoPlayer = VideoPlayer("./ScreenRecorderTest/video.mp4")
 
         # Creamos el notebok que manejará las pestañas
         self.notebook = ttk.Notebook(self.root)
@@ -53,7 +51,7 @@ class App:
         
         # Creamos las clases que representan cada pestaña de la App
         self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker, self) 
-        self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.root, self.frame2, self.videoPlayer)
+        self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.frame2)
         
         self.mainTab.setUp()
         self.videoPlayerTab.setUp()        

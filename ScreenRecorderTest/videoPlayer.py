@@ -17,19 +17,23 @@ class VideoPlayer:
         self.duration = self.dt * self.nFrames
         self.currentFrame = 0
 
-        self.frames = []
-        for _ in range(self.nFrames):         
-            self.frames.append(self.video.read()[1])
-        self.frames.append(None)
+
+        for f in range(self.nFrames, -1, -1):
+            self.video.set(cv2.CAP_PROP_POS_FRAMES, f)
+            ret, self.lastFrame = self.video.read()
+            if ret: break
+
+        print(ret)
 
         print(f'Duración del video: {self.duration}')
         print(f'FPS: {int(self.video.get(cv2.CAP_PROP_FPS))}')
         print(f'Frames totales {self.nFrames}')
 
     def getFrame(self, time):
-        self.currentFrame = int(time / self.dt)      
-        if self.currentFrame < self.nFrames:
-            return True, self.frames[self.currentFrame]
-        else:
+        self.currentFrame = int(time / self.dt) 
+        self.video.set(cv2.CAP_PROP_POS_FRAMES, self.currentFrame)
+        ret, frame = self.video.read()  
+        if not ret: 
+            frame = self.lastFrame
             self.currentFrame = self.nFrames - 1
-            return False, self.frames[self.currentFrame]
+        return ret, frame

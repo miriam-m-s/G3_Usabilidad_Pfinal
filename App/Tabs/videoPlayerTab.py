@@ -1,76 +1,114 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter as tk
+from tkinter import filedialog
 import cv2
 from PIL import Image, ImageTk
-import threading
+from App.Frames import slicer
+from ScreenRecorderTest.videoPlayer import VideoPlayer
 
 class VideoPlayerTab:
 
-    def __init__(self, root, tab, videoPlayer):
-        self.root = root
+    currentTime = 0
+
+    frameIncrease = 0
+    timeIncrease = 0
+    timeChange = -1
+    restartFlag = False
+
+    playing = False
+    sliding = False
+
+    slicerList = []
+    sliceCount = 0
+
+    clipboard = 0
+
+    videoPlayer = None
+    lastRecording = "./ScreenRecorderTest/video.mp4"
+    loadNewVideo = False
+
+    def __init__(self, tab):
         self.tab = tab  
-        self.videoPlayer = videoPlayer
-        self.currentTime = 0
-        self.increase = 0
-        self.playing = False
-        self.forceStop = False
 
     def setUp(self):
 
-        relation = self.videoPlayer.height / self.videoPlayer.width
-        self.width = int(self.videoPlayer.width * 0.5)
+        relation = 1080 / 1920
+        self.width = int(1920 * 0.5)
         self.height = round(self.width * relation)
 
+        load_video_frame = tk.Frame(self.tab)
+        load_video_frame.grid(row=0, column=0, sticky="w")
+
+        ttk.Button(load_video_frame, text="Load video",  
+            command=self.__loadVideo).pack(side=tk.LEFT) 
+        ttk.Button(load_video_frame, text="Load last recording",  
+            command=self.__loadLastRecording).pack(side=tk.LEFT)
+
         self.canvas = tk.Canvas(self.tab, width=self.width, height=self.height)
-        self.canvas.grid(row=0, column=0)
+        self.canvas.grid(row=1, column=0)
 
         self.slider = tk.Scale(self.tab, 
-                               from_=0, to=self.videoPlayer.duration, resolution=0.001,
+                               from_=0, resolution=0.001,
                                orient=tk.HORIZONTAL, length=self.width, 
-                               command=self.__changeVideoTime,
+                               command=self.__setCurrentTime,
                                showvalue=0)
-        self.slider.grid(row=1, column=0)
-        self.slider.bind("<ButtonPress>", lambda event: setattr(self, 'forceStop', True))
-        self.slider.bind("<ButtonRelease>", lambda event: setattr(self, 'forceStop', False))
+        self.slider.grid(row=2, column=0)
+        self.slider.bind("<ButtonPress>", lambda _: setattr(self, 'sliding', True))
+        self.slider.bind("<ButtonRelease>", lambda _: setattr(self, 'sliding', False))
 
         video_controller_frame = tk.Frame(self.tab)
-        video_controller_frame.grid(row=2, column=0, sticky="ew")
-
-        # Configuración de peso para las tres columnas dentro del video_controller_frame
+        video_controller_frame.grid(row=3, column=0, sticky="ew")
         video_controller_frame.columnconfigure(0, weight=1)
         video_controller_frame.columnconfigure(1, weight=1)  
         video_controller_frame.columnconfigure(2, weight=1)  
+
         button_frame = tk.Frame(video_controller_frame)
         button_frame.grid(row=0, column=1)
 
         button_size = 3  
-        ttk.Button(button_frame, text="<", width=button_size, command=lambda: self.__increaseTime(-self.videoPlayer.dt)).pack(side=tk.LEFT)     
-        ttk.Button(button_frame, text="<<", width=button_size, command=lambda: self.__increaseTime(-1)).pack(side=tk.LEFT)  
+        ttk.Button(button_frame, text="<", width=button_size, 
+                   command=lambda: setattr(self, 'frameIncrease', self.frameIncrease - 1)).pack(side=tk.LEFT)     
+        ttk.Button(button_frame, text="<<", width=button_size, 
+                   command=lambda: setattr(self, 'timeIncrease', self.timeIncrease - 1)).pack(side=tk.LEFT)      
         self.playButton = ttk.Button(button_frame, text="I >", command=self.__play, width=button_size)
         self.playButton.pack(side=tk.LEFT)
-        ttk.Button(button_frame, text=">>", width=button_size, command=lambda: self.__increaseTime(1)).pack(side=tk.LEFT) 
-        ttk.Button(button_frame, text=">", width=button_size, command=lambda: self.__increaseTime(self.videoPlayer.dt)).pack(side=tk.LEFT)
+        ttk.Button(button_frame, text=">>", width=button_size, 
+                   command=lambda: setattr(self, 'timeIncrease', self.timeIncrease + 1)).pack(side=tk.LEFT) 
+        ttk.Button(button_frame, text=">", width=button_size, 
+                   command=lambda: setattr(self, 'frameIncrease', self.frameIncrease + 1)).pack(side=tk.LEFT)
 
         self.videoTimeLabel = tk.Label(video_controller_frame, text="00:00:000")
         self.videoTimeLabel.grid(row=0, column=2, sticky="e")
 
         self.videoFrameLabel = tk.Label(video_controller_frame, text="00000000")
-        self.videoFrameLabel.grid(row=0, column=0, sticky="w")
-        
+        self.videoFrameLabel.grid(row=0, column=0, sticky="w")  
 
+        self.slicer_frame = tk.Frame(self.tab)
+        self.slicer_frame.grid(row=1, column=1, sticky="n")
+
+        self.add_button_frame = tk.Frame(self.slicer_frame)
+        self.add_button_frame.pack(side=tk.TOP, anchor="w")  
+
+        ttk.Button(self.add_button_frame, text="+", width=button_size,
+                command=self.createSlicer).pack()
+        
+        for widget in self.tab.winfo_children():
+            widget.grid_remove()
+
+        load_video_frame.grid()
+             
     def update(self, dt):
-        
-        if self.playing and not self.forceStop:   
-            self.currentTime += dt
-            self.slider.set(self.currentTime)
 
-        if self.increase != 0:
-            self.currentTime += self.increase
-            self.currentTime = max(0, min(self.currentTime, self.videoPlayer.duration))
-            self.slider.set(self.currentTime)
-            self.forceStop = False
-            self.increase = 0
+        self.__loadVideoChecker()
+
+        if self.videoPlayer is None:
+            return
+        
+        if self.playing and not self.sliding:   
+            self.currentTime += dt
+
+        self.__checkEvents()
 
         ret, frame = self.videoPlayer.getFrame(self.currentTime)
 
@@ -78,30 +116,106 @@ class VideoPlayerTab:
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
 
-        self.forceStop = True if not ret else self.forceStop
+        if not ret:
+            self.playButton.config(text="I >")
+            self.playing = False
 
-        self.videoTimeLabel.config(text=self.__MMSSMMM())
-        self.videoFrameLabel.config(text=str(self.videoPlayer.currentFrame).zfill(8))   
+        self.slider.set(self.currentTime)
+        self.videoTimeLabel.config(text=self.__MMMSSMMM())
+        self.videoFrameLabel.config(text=str(self.videoPlayer.currentFrame).zfill(9)) 
+
+    def __loadVideoChecker(self):     
+        if self.loadNewVideo:
+            self.loadNewVideo = False 
+
+            self.videoPlayer = VideoPlayer(self.filePath)
+
+            self.slider.config(to=self.videoPlayer.duration)  
+            self.currentTime = 0
+            self.playButton.config(text="I >")
+            self.playing = False
+
+            while self.slicerList:
+                self.deleteSlicer(self.slicerList[0])
+
+            for widget in self.tab.winfo_children():
+                widget.grid()          
+
+    def __loadVideo(self):
+        self.filePath = filedialog.askopenfilename(title="Seleccionar video", filetypes=(("Archivos de video", "*.mp4 *.avi"), ("Todos los archivos", "*.*")))
+        if self.filePath:
+            self.loadNewVideo = True
+            print("Ruta del archivo seleccionado:", self.filePath)
+        
+
+    def __loadLastRecording(self):
+        self.filePath = self.lastRecording
+        self.loadNewVideo = True
+
+    def __checkEvents(self):
+
+        if self.timeIncrease != 0:
+            self.currentTime += self.timeIncrease
+            self.currentTime = max(0, min(self.currentTime, self.videoPlayer.duration))
+            self.timeIncrease = 0 
+
+        if self.timeChange >= 0:
+            self.currentTime = self.timeChange
+            self.timeChange = -1
+
+        # Hay un bug con el primer y último frame (me da igual 🗿🚬)
+        if self.frameIncrease != 0:           
+            self.currentTime += self.frameIncrease * self.videoPlayer.dt
+            self.currentTime = max(0, min(self.currentTime, self.videoPlayer.duration))          
+            self.frameIncrease = 0
+
+        if self.restartFlag:
+            self.currentTime = 0
+            self.restartFlag = False
 
     def __play(self):
         self.playing = not self.playing
 
         if self.playing:
-            self.playButton.config(text="I I")
+            if self.currentTime >= self.videoPlayer.duration:
+                self.restartFlag = True
+            self.playButton.config(text="I I")      
         else:
-            self.playButton.config(text="I >")
+            self.playButton.config(text="I >")       
 
-    def __changeVideoTime(self, value):
+    def __setCurrentTime(self, value):
         self.currentTime = float(value)
 
-    def __MMSSMMM(self):
+    def createSlicer(self):
+        frame = tk.Frame(self.slicer_frame)
+        frame.pack(side=tk.TOP, in_=self.slicer_frame, before=self.add_button_frame)
+        self.slicerList.append(slicer.Slicer(self, frame, f"Slice {self.sliceCount}"))
+        self.sliceCount += 1
 
-        minutes = int(self.currentTime / 60)
-        seconds = int(self.currentTime - minutes * 60)
-        milliseconds = int((self.currentTime - minutes * 60 - seconds) * 1000)
+    def deleteSlicer(self, slicer):
+        self.slicerList.remove(slicer)
+        slicer.frame.destroy()
+        print('Slicer eliminado')
 
-        return f'{str(minutes).zfill(2)}:{str(seconds).zfill(2)}:{str(milliseconds).zfill(3)}'
+    def MMMSSMMM(self, time):
+
+        minutes = int(time / 60)
+        seconds = int(time - minutes * 60)
+        milliseconds = int((time - minutes * 60 - seconds) * 1000)
+
+        return f'{str(minutes).zfill(3)}:{str(seconds).zfill(2)}:{str(milliseconds).zfill(3)}'
+
+    def __MMMSSMMM(self):
+        return self.MMMSSMMM(self.currentTime)
+      
+
+
+
+
+        
     
-    def __increaseTime(self, seconds):
-        self.increase += seconds
+
+
+
+    
     
