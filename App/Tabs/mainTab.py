@@ -57,8 +57,15 @@ class MainTab(Tab):
         
         #Creacion del EventSender y JSONSerializer
         self.serializer = JsonSerializer()
-        self.eventSender = EventSender(self.serializer, 5, self.calibrator_manager.getTopLeft(), self.calibrator_manager.getTopRight(),
-                                       self.calibrator_manager.getBottomLeft(), self.calibrator_manager.getBottomRight())  #Enviar eventos cada 5 segundos
+        left, right, up, bottom = self.mean_coordinates()
+        self.eventSender = EventSender(self.serializer, 5, left, right, up,bottom) 
+
+    def mean_coordinates(self):
+        left=(self.calibrator_manager.getTopLeft()[0]+self.calibrator_manager.getBottomLeft()[0])/2
+        right=(self.calibrator_manager.getTopRight()[0]+self.calibrator_manager.getBottomRight()[0])/2
+        up=(self.calibrator_manager.getTopLeft()[1]+self.calibrator_manager.getTopRight()[1])/2
+        bottom=(self.calibrator_manager.getBottomLeft()[1]+self.calibrator_manager.getBottomRight()[1])/2
+        return left,right,up,bottom #Enviar eventos cada 5 segundos
         
     def load_images(self):
         gray_image = Image.open(self.gray_circle_path)
@@ -139,8 +146,8 @@ class MainTab(Tab):
         self.calibrator_manager.get_calibration_map()
         print("Calibración completa")
         self.shut_down_calibration()
-        self.eventSender.setCalibrationPoints(self.calibrator_manager.getTopLeft(), self.calibrator_manager.getTopRight(),
-                                             self.calibrator_manager.getBottomLeft(), self.calibrator_manager.getBottomRight())
+        left, right, up, bottom = self.mean_coordinates()
+        self.eventSender.setCalibrationPoints(left, right, up, bottom)
 
     def update_corner_view(self):
         current_corner = self.calibrator_manager.current_calibration
@@ -174,21 +181,20 @@ class MainTab(Tab):
         if self.playing == False: #or self.calibration_running para no mostrarlo en la calibración. Hay que borrar el id de la imagen también
             return
         
-        frame, left_pupil, right_pupil = self.eyeTracker.getFrame()
+        frame, horizontal_gaze, vertical_gaze = self.eyeTracker.getFrame()
         
         #TODO: enviar eventos de seguimiento ocular
-        if left_pupil is not None and right_pupil is not None:
+        if horizontal_gaze is not None and vertical_gaze is not None:
             #todo: media x e y de las pupilas
-            mean_x = (left_pupil[0] + right_pupil[0]) / 2
-            mean_y = (left_pupil[1] + right_pupil[1]) / 2
-            self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(),x=mean_x,y=mean_y))
+          
+            self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(),x=horizontal_gaze,y=vertical_gaze))
 
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)
         
         if self.calibration_running:
-            self.update_calibration_(left_pupil, right_pupil)
+            self.update_calibration_(horizontal_gaze, vertical_gaze)
 
     def update_calibration_(self, left_pupil, right_pupil):
         if self.calibration_running == False or left_pupil is None or right_pupil is None:
@@ -197,7 +203,7 @@ class MainTab(Tab):
         if self.wait_for_user_input:
             return
         #print(f"Pupila izq: {left_pupil}")
-        calibration_otuput = self.calibrator_manager.calibrate_update(left_pupil_coords=left_pupil, right_pupil_coords=right_pupil)
+        calibration_otuput = self.calibrator_manager.calibrate_update(horizontal_gaze=left_pupil, vertical_gaze=right_pupil)
 
         if calibration_otuput == calibrate.CalibrationOutput.CALIBRATION_COMPLETED:
             self.on_calibration_completed()

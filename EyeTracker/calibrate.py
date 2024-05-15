@@ -51,7 +51,7 @@ class Calibrator :
         self.current_iteration = 0
         print("Reset")
 
-    def collect_data(self, left_pupil_coords, right_pupil_coords) :
+    def collect_data(self, horizontal_gaze,vertical_gaze) :
 
         # TRUCO PARA SABER SI LAS COORDENADAS DE MIRADA SON VÁLIDAS:
         # Como la primera calibración es respecto al centro, una vez completada esta, podemos saber si el usuario está
@@ -60,10 +60,9 @@ class Calibrator :
         # esto se puede hacer mandando como parámetro de entrada una función de validación desde el Manager, que compruebe
         # bajo que casos podemos aceptar datos, por ejemplo.
 
-        mean_x = (left_pupil_coords[0] + right_pupil_coords[0]) / 2
-        mean_y = (left_pupil_coords[1] + right_pupil_coords[1]) / 2
+      
 
-        self.collected_data.append((mean_x, mean_y))
+        self.collected_data.append((horizontal_gaze, vertical_gaze))
 
 
         self.current_iteration += 1
@@ -125,7 +124,7 @@ class CalibratorManager :
                         }
         self.calibrator.reset()
 
-    def calibrate_update(self, left_pupil_coords, right_pupil_coords) :
+    def calibrate_update(self, horizontal_gaze, vertical_gaze) :
 
 
         # Esperar a que indique que ya está mirando hacia esta posición
@@ -148,7 +147,7 @@ class CalibratorManager :
             return CalibrationOutput.CALIBRATION_COMPLETED # Calibración completada
             # Mostrar mensaje de calibración terminada
 
-        if not self.calibrator.collect_data(left_pupil_coords, right_pupil_coords) :
+        if not self.calibrator.collect_data(horizontal_gaze, vertical_gaze) :
             # Calibración completada para esta posición
             screen_position = self.positions[self.current_calibration]
             self.calibration_map[screen_position] = self.calibrator.process_data(screen_position)

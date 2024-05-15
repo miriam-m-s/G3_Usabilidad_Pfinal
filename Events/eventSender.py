@@ -1,14 +1,14 @@
 import time
 import os
 class EventSender:
-    def __init__(self, serializer, interval, topLeft, topRight, bottomLeft, bottomRight):
+    def __init__(self, serializer, interval, left, right, up,bottom):
         self.serializer = serializer
         self.interval = interval
         self.events = []
-        self.topLeft = topLeft
-        self.topRight = topRight
-        self.bottomLeft = bottomLeft
-        self.bottomRight = bottomRight
+        self.left = left
+        self.right = right
+        self.bottom = bottom
+        self.up = up
         
         #Creacion de carpeta para eventos
         self.tracked_events_folder = "TrackedEvents"
@@ -17,15 +17,15 @@ class EventSender:
             
         self.last_save_time = time.time()
             
-    def setCalibrationPoints(self, topLeft, topRight, bottomLeft, bottomRight):
-        self.topLeft = topLeft
-        self.topRight = topRight
-        self.bottomLeft = bottomLeft
-        self.bottomRight = bottomRight
-        print(f"TopLeft: {self.topLeft}")
-        print(f"TopRight: {self.topRight}")
-        print(f"BottomLeft: {self.bottomLeft}")
-        print(f"BottomRight: {self.bottomRight}")
+    def setCalibrationPoints(self, left, right, up,bottom):
+        self.left = left
+        self.right = right
+        self.bottom = bottom
+        self.up = up
+        print(f"TopLeft: {self.left}")
+        print(f"TopRight: {self.right}")
+        print(f"BottomLeft: {self.bottom}")
+        print(f"BottomRight: {self.up}")
         
     def addEvent(self, event):
         
@@ -52,21 +52,24 @@ class EventSender:
     def normalizeEvents(self,coordX,coordY):
 
         
-        if self.topRight[0] - self.topLeft[0] == 0:
+        if self.right - self.left == 0:
             normX = 0
         else:
-            normX = (coordX - self.topLeft[0]) / (self.topRight[0] - self.topLeft[0])
+            normX = (coordX - self.left) / (self.right - self.left)
 
-        if self.bottomLeft[1] - self.topLeft[1] == 0:
+        if self.bottom - self.up == 0:
             normY = 0
         else:
-            normY = (coordY - self.topLeft[1]) / (self.bottomLeft[1] - self.topLeft[1])
+            normY = (coordY - self.up) / (self.bottom - self.up)
 
         print(f"CoordX: {coordX}")
         print(f"CoordY: {coordY}")
         print(f"NormX: {normX}")
         print(f"NormY: {normY}")
-        
+        print(f"SelfTopRight: {self.right}")
+        print(f"self.topLeft: {self.left}")
+        print(f"self.bottomLeft: {self.bottom}")
+        print(f"self.bottomRight: {self.up}")
         
         return normX, normY
         
