@@ -6,7 +6,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import math 
 class dataAnalyzer:
-    def createHeatMap(coords):
+    #Crea un mapa de calor según el tiempo que se ha mirado a cada posición de la pantalla
+    def createTimeHeatMap(coords):
         # dataframe para el mapa de calor
         heatData = pd.DataFrame([[0]*10]*10)
         print(heatData)
@@ -26,8 +27,36 @@ class dataAnalyzer:
         plt.figure(figsize=(10,10))
         sns.heatmap(heatData,cmap='coolwarm', annot=True,  square=True, linewidths=.5)
         plt.show()
+    #Crea un mapa de calor según cuantas veces se ha mirado cada posición de la pantalla
+    def createCountHeatMap(coords):
+        # dataframe para el mapa de calor
+        heatData = pd.DataFrame([[0]*10]*10)
+        print(heatData)
+        xCoord=0
+        yCoord=0
+        prevXcoord=-1
+        prevYcoord=-1
+       #recorro todo el array para parsear las posiciones a casillas del dataframe
+        for c in coords:
+            xCoord= math.trunc(c[0] * 10)
+            yCoord= math.trunc(c[1] * 10)
+            if(xCoord ==10):
+                xCoord = 1
+            if(yCoord == 10):
+                yCoord = 1   
+            #Comprueba que la posición no sea igual a la anterior para añadirla al mapa
+            if(prevXcoord == xCoord and prevYcoord == yCoord):
+                continue
+            heatData[xCoord][yCoord] = heatData[xCoord][yCoord] +1
+            prevXcoord = xCoord
+            prevYcoord = yCoord
+        print(heatData) 
+        #Creación del heatmap
+        plt.figure(figsize=(10,20))
+        sns.heatmap(heatData,cmap='coolwarm', annot=True,  square=True, linewidths=.5)
+        plt.show()
     # Cargar el JSON desde un archivo
-    with open('prueba.json', 'r') as json_data:
+    with open('prueba2.json', 'r') as json_data:
         data = json.load(json_data)
     eyePosData = data["eye_positions"]
     
@@ -49,8 +78,8 @@ class dataAnalyzer:
             break
         print
         totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
-    createHeatMap(totalPositions)
-
+    createTimeHeatMap(totalPositions)
+    createCountHeatMap(totalPositions)
 
 
 
