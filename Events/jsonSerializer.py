@@ -7,7 +7,7 @@ class JsonSerializer:
                 return ".json"
 
         def initFileFormat(self):
-                return "{\n \"Events\": [\n"
+                return "{\n \"eye_positions\": [\n"
 
         def serialize(self, event):
                 return event.toJson() + "," + "\n"
