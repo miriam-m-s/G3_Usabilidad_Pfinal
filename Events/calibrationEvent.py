@@ -1,10 +1,10 @@
 from Events.event import Event
 
 class CalibrationEvent(Event):
-    def __init__(self, timestamp,widht,height):
+    def __init__(self, timestamp,width,height):
         super().__init__(timestamp)
-        self.event_type = 0
-        self.width=widht
+        self.event_type = 1
+        self.width=width
         self.height=height
         
     def toJson(self):

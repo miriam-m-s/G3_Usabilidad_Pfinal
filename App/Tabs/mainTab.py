@@ -12,6 +12,7 @@ import time
 from Events.eventSender import EventSender
 from Events.jsonSerializer import JsonSerializer
 from Events.eyeTrackingEvent import EyeTrackingEvent
+from Events.calibrationEvent import CalibrationEvent
 
 class MainTab(Tab):
 
@@ -130,8 +131,9 @@ class MainTab(Tab):
         self.canvas.config(width=w, height=h)
 
         self.corner_coords = self.calibrator_manager.get_corner_calibration_order_position()
-        self.calibrator_manager.get_current_relative_corner()      
-   
+        self.calibrator_manager.get_current_relative_corner() 
+             
+
         self.corner_images = []
         for corner in self.corner_coords:
             x = corner[0] * w
@@ -139,6 +141,9 @@ class MainTab(Tab):
             #self.canvas.create_image(0, 0, anchor="nw", image=self.background_img)
             self.corner_images.append(self.canvas.create_image(x, y, anchor="center",image = self.gray_circle_photo))
 
+        calEvent=CalibrationEvent(timestamp=time.time(),width=w,height=h)
+        calEvent.setCoords(w,h)        
+        self.eventSender.addEvent(calEvent)
         self.update_corner_view()
         
     def on_calibration_completed(self):
@@ -148,6 +153,7 @@ class MainTab(Tab):
         self.shut_down_calibration()
         left, right, up, bottom = self.mean_coordinates()
         self.eventSender.setCalibrationPoints(left, right, up, bottom)
+       
 
     def update_corner_view(self):
         current_corner = self.calibrator_manager.current_calibration
@@ -186,8 +192,10 @@ class MainTab(Tab):
         #TODO: enviar eventos de seguimiento ocular
         if horizontal_gaze is not None and vertical_gaze is not None:
             #todo: media x e y de las pupilas
-          
-            self.eventSender.addEvent(EyeTrackingEvent(timestamp=time.time(),x=horizontal_gaze,y=vertical_gaze))
+            normX, normY = self.eventSender.normalizeEvents(horizontal_gaze, vertical_gaze)
+            event=EyeTrackingEvent(timestamp=time.time(),x=horizontal_gaze,y=vertical_gaze)
+            event.setCoords(normX, normY)
+            self.eventSender.addEvent(event)
 
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
