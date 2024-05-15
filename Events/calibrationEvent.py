@@ -7,10 +7,10 @@ class CalibrationEvent(Event):
         self.width=width
         self.height=height
         
-    def toJson(self):
+    def to_json(self):
         return f'{{\n "id": {self.event_type},\n "width": {self.width},\n "height": {self.height},\n "timestamp": {self.timestamp}\n}}'
     
-    def setCoords(self,w,h):
+    def set_coords(self,w,h):
         self.width=w
         self.height=h
         

@@ -142,8 +142,8 @@ class MainTab(Tab):
             self.corner_images.append(self.canvas.create_image(x, y, anchor="center",image = self.gray_circle_photo))
 
         calEvent=CalibrationEvent(timestamp=time.time(),width=w,height=h)
-        calEvent.setCoords(w,h)        
-        self.eventSender.addEvent(calEvent)
+        calEvent.set_coords(w,h)        
+        self.eventSender.add_event(calEvent)
         self.update_corner_view()
         
     def on_calibration_completed(self):
@@ -152,7 +152,7 @@ class MainTab(Tab):
         print("Calibración completa")
         self.shut_down_calibration()
         left, right, up, bottom = self.mean_coordinates()
-        self.eventSender.setCalibrationPoints(left, right, up, bottom)
+        self.eventSender.set_calibration_points(left, right, up, bottom)
        
 
     def update_corner_view(self):
@@ -192,10 +192,10 @@ class MainTab(Tab):
         #TODO: enviar eventos de seguimiento ocular
         if horizontal_gaze is not None and vertical_gaze is not None:
             #todo: media x e y de las pupilas
-            normX, normY = self.eventSender.normalizeEvents(horizontal_gaze, vertical_gaze)
+            normX, normY = self.eventSender.normalize_events(horizontal_gaze, vertical_gaze)
             event=EyeTrackingEvent(timestamp=time.time(),x=horizontal_gaze,y=vertical_gaze)
-            event.setCoords(normX, normY)
-            self.eventSender.addEvent(event)
+            event.set_coords(normX, normY)
+            self.eventSender.add_event(event)
 
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))

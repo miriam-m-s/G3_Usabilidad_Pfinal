@@ -1,13 +1,13 @@
 class JsonSerializer: 
     
-        def endFileFormat(self):
+        def end_file_format(self):
                 return "{}]}"
 
-        def getFileExtension(self):
+        def get_file_extension(self):
                 return ".json"
 
-        def initFileFormat(self):
+        def init_file_format(self):
                 return "{\n \"Events\": [\n"
 
         def serialize(self, event):
-                return event.toJson() + "," + "\n"
+                return event.to_json() + "," + "\n"

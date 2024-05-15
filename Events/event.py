@@ -3,11 +3,11 @@ class Event:
         self.timestamp = timestamp
         self.event_type = -1
         
-    def toJson(self):
+    def to_json(self):
         pass
-    def setCoords(self,coord1,coord2):
+    def set_coords(self,coord1,coord2):
         pass
-    def getType(self):
+    def get_type(self):
         return self.event_type
     
     

@@ -7,10 +7,10 @@ class EyeTrackingEvent(Event):
         self.x=x
         self.y=y
         
-    def toJson(self):
+    def to_json(self):
         return f'{{\n "id": {self.event_type},\n "posX": {self.x},\n "posY": {self.y},\n "timestamp": {self.timestamp}\n}}'
     
-    def setCoords(self,x,y):
+    def set_coords(self,x,y):
         self.x=x
         self.y=y
 

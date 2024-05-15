@@ -17,32 +17,32 @@ class EventSender:
             
         self.last_save_time = time.time()
             
-    def setCalibrationPoints(self, left, right, up,bottom):
+    def set_calibration_points(self, left, right, up,bottom):
         self.left = left
         self.right = right
         self.bottom = bottom
         self.up = up
         
-    def addEvent(self, event):
+    def add_event(self, event):
         
         self.events.append(event)
-        print(f"Evento agregado")
+        
         if time.time() - self.last_save_time >= self.interval:
-            self.saveEvents()
+            self.save_events()
             self.last_save_time = time.time()
 
-    def saveEvents(self):
+    def save_events(self):
         
-        filename = f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.getFileExtension()}"
+        filename = f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
         with open(filename, 'w') as file:
-            file.write(self.serializer.initFileFormat())
+            file.write(self.serializer.init_file_format())
             for event in self.events:
                 file.write(self.serializer.serialize(event))
-            file.write(self.serializer.endFileFormat())
+            file.write(self.serializer.end_file_format())
         self.events = []
     
         
-    def normalizeEvents(self,coordX,coordY):
+    def normalize_events(self,coordX,coordY):
 
         if self.right - self.left == 0:
             normX = 0
