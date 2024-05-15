@@ -89,28 +89,26 @@ class CalibratorManager :
 
     # Posición de cada esquina 0-1
     corner_relative_positions = {
+                        ScreenPositions.CENTER        : (0.5, 0.5),
                         ScreenPositions.TOP_LEFT      : (0,0),
                         ScreenPositions.TOP_RIGHT     : (1,0),
-                        ScreenPositions.BOTTOM_LEFT   : (0,1),
                         ScreenPositions.BOTTOM_RIGHT  : (1,1),
-                        ScreenPositions.CENTER        : (0.5, 0.5)
+                        ScreenPositions.BOTTOM_LEFT   : (0,1)
                         }
 
-    calibration_map = {ScreenPositions.TOP_LEFT : (0,0),
-
+    calibration_map = {
+                        ScreenPositions.CENTER : (0,0),
+                        ScreenPositions.TOP_LEFT : (0,0),
                         ScreenPositions.TOP_RIGHT : (0,0),
-
-                        ScreenPositions.BOTTOM_LEFT : (0,0),
-
                         ScreenPositions.BOTTOM_RIGHT : (0,0),
-
-                        ScreenPositions.CENTER : (0,0)}
+                        ScreenPositions.BOTTOM_LEFT : (0,0)
+                    }
 
     calibrator = None
 
     current_calibration = 0
 
-    positions = [ScreenPositions.CENTER, ScreenPositions.TOP_LEFT, ScreenPositions.TOP_RIGHT, ScreenPositions.BOTTOM_LEFT, ScreenPositions.BOTTOM_RIGHT]
+    positions = [ScreenPositions.CENTER, ScreenPositions.TOP_LEFT, ScreenPositions.TOP_RIGHT, ScreenPositions.BOTTOM_RIGHT, ScreenPositions.BOTTOM_LEFT]
 
 
     def __init__(self):
@@ -118,11 +116,13 @@ class CalibratorManager :
 
     def reset(self):
         self.current_calibration = 0
-        self.calibration_map = {ScreenPositions.TOP_LEFT : (0,0),
+        self.calibration_map = {
+                        ScreenPositions.CENTER : (0,0),
+                        ScreenPositions.TOP_LEFT : (0,0),
                         ScreenPositions.TOP_RIGHT : (0,0),
-                        ScreenPositions.BOTTOM_LEFT : (0,0),
                         ScreenPositions.BOTTOM_RIGHT : (0,0),
-                        ScreenPositions.CENTER : (0,0)}
+                        ScreenPositions.BOTTOM_LEFT : (0,0)
+                        }
         self.calibrator.reset()
 
     def calibrate_update(self, left_pupil_coords, right_pupil_coords) :

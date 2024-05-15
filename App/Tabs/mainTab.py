@@ -6,13 +6,14 @@ import cv2
 from PIL import Image, ImageTk
 from EyeTracker import calibrate
 from App.AppState import instructions
+from App.Tabs.tab import Tab
 
 import time
 from Events.eventSender import EventSender
 from Events.jsonSerializer import JsonSerializer
 from Events.eyeTrackingEvent import EyeTrackingEvent
 
-class MainTab:
+class MainTab(Tab):
 
     cam_img_id = None 
     calibration_running = None
@@ -21,6 +22,9 @@ class MainTab:
     gray_circle_path = "./App/Images/grayCircle.png"
     green_circle_path = "./App/Images/greenCircle.png"
     red_circle_path = "./App/Images/redCircle.png"
+    orange_circle_path = "./App/Images/orangeCircle.png"
+
+    wait_for_user_input = False
 
     circle_width = 90
 
@@ -30,14 +34,14 @@ class MainTab:
         self.playing = False
         self.app = app 
  
-    def setUp(self):
+    def set_up(self):
         self.canvas = tk.Canvas(self.tab, width=1000, height=600)
         self.canvas.pack()
 
-        self.play_button = ttk.Button(self.canvas, text="Play", command=self.play)
-        self.calibrate_button = ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration)
-        self.stop_button = ttk.Button(self.canvas, text="Stop", command=self.stop)
-        self.instructions_button = ttk.Button(self.canvas, text="Instructions", command=self.show_instructions)
+        self.play_button = ttk.Button(self.canvas, text="Play", command=self.play, takefocus=False)
+        self.calibrate_button = ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration, takefocus=False)
+        self.stop_button = ttk.Button(self.canvas, text="Stop", command=self.stop, takefocus=False)
+        self.instructions_button = ttk.Button(self.canvas, text="Instructions", command=self.show_instructions, takefocus=False)
         
         x = self.app.init_window_width * 0.45
         y = 10
@@ -60,16 +64,19 @@ class MainTab:
         gray_image = Image.open(self.gray_circle_path)
         red_image = Image.open(self.red_circle_path)
         green_image = Image.open(self.green_circle_path)
+        orange_image = Image.open(self.orange_circle_path)
 
         w = self.circle_width
 
         resized_gray = gray_image.resize((w, w), Image.LANCZOS)
         resized_red = red_image.resize((w, w), Image.LANCZOS)
         resized_green = green_image.resize((w, w), Image.LANCZOS)
+        resized_orange = orange_image.resize((w, w), Image.LANCZOS)
 
-        self.gray_circle_photo = ImageTk.PhotoImage(resized_gray)
-        self.green_circle_photo = ImageTk.PhotoImage(resized_green)
-        self.red_circle_photo = ImageTk.PhotoImage(resized_red)
+        self.gray_circle_photo   = ImageTk.PhotoImage(resized_gray)
+        self.green_circle_photo  = ImageTk.PhotoImage(resized_green)
+        self.red_circle_photo    = ImageTk.PhotoImage(resized_red)
+        self.orange_circle_photo = ImageTk.PhotoImage(resized_orange)
         
     # MARK: BUTTON CALLBACKS
     def show_instructions(self):
@@ -102,9 +109,11 @@ class MainTab:
         self.instructions_button.place_forget()
         self.calibrate_button.place_forget()
 
+        print("Caballo")
         self.calibrator_manager.reset()
         self.app.set_fullscreen(True)
         self.calibration_running = True
+        self.wait_for_user_input = True
 
         self.app.root.after(400, self.set_up_window_calibration)
 
@@ -142,6 +151,7 @@ class MainTab:
             self.canvas.itemconfig(img_id, image=self.green_circle_photo)
 
         if current_corner <= len(self.corner_images) - 1:
+            print("Red")
             img_id = self.corner_images[current_corner]
             self.canvas.itemconfig(img_id, image=self.red_circle_photo)
 
@@ -183,10 +193,23 @@ class MainTab:
         if self.calibration_running == False or left_pupil is None or right_pupil is None:
             return
 
-        print(f"Pupila izq: {left_pupil}")
+        if self.wait_for_user_input:
+            return
+        #print(f"Pupila izq: {left_pupil}")
         calibration_otuput = self.calibrator_manager.calibrate_update(left_pupil_coords=left_pupil, right_pupil_coords=right_pupil)
 
         if calibration_otuput == calibrate.CalibrationOutput.CALIBRATION_COMPLETED:
             self.on_calibration_completed()
         elif calibration_otuput == calibrate.CalibrationOutput.CORNER_COMPLETED:
-            self.update_corner_view()        
+            self.update_corner_view()
+            self.wait_for_user_input = True        
+
+    # MARK: KEY EVENTS
+    def key_pressed(self, event):
+        if self.calibration_running == False:
+            return
+        
+        if self.wait_for_user_input and event.keysym == "space":
+            current_corner = self.calibrator_manager.current_calibration
+            img_id = self.corner_images[current_corner]
+            self.canvas.itemconfig(img_id, image=self.orange_circle_photo)

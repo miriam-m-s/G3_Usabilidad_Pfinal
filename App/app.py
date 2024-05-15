@@ -47,14 +47,16 @@ class App:
 
         #Los hacemos pack
         self.notebook.pack(fill="both", expand=True)
-        self.notebook.bind("<<NotebookTabChanged>>", self.onTabChanged)
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
         
         # Creamos las clases que representan cada pestaña de la App
         self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker, self) 
         self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.frame2)
         
-        self.mainTab.setUp()
-        self.videoPlayerTab.setUp()        
+        self.mainTab.set_up()
+        self.videoPlayerTab.set_up()  
+
+        self.root.bind    ('<Key>', self.key_pressed)  
 
     def set_fullscreen(self, fullscren):
         self.root.attributes("-fullscreen", fullscren)
@@ -70,10 +72,8 @@ class App:
         self.lastUpdateTime = 0
         self.root.mainloop()
 
-    def onTabChanged(self, event):
-        return
     
-    def onTabChanged(self, event):
+    def on_tab_changed(self, event):
         
         #curentTab = self.notebook.select()
         selectedTab = self.notebook.select()
@@ -103,3 +103,7 @@ class App:
 
         # FPS máximos
         # self.root.after(10, self.__update)
+
+    def key_pressed(self, event):
+        if self.currentTab is not None:
+            self.currentTab.key_pressed(event)

@@ -6,8 +6,9 @@ import cv2
 from PIL import Image, ImageTk
 from App.Frames import slicer
 from ScreenRecorderTest.videoPlayer import VideoPlayer
+from App.Tabs.tab import Tab
 
-class VideoPlayerTab:
+class VideoPlayerTab(Tab):
 
     currentTime = 0
 
@@ -31,7 +32,7 @@ class VideoPlayerTab:
     def __init__(self, tab):
         self.tab = tab  
 
-    def setUp(self):
+    def set_up(self):
 
         relation = 1080 / 1920
         self.width = int(1920 * 0.5)
