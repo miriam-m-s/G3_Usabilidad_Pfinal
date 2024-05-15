@@ -150,10 +150,11 @@ class MainTab(Tab):
             img_id = self.corner_images[current_corner - 1]
             self.canvas.itemconfig(img_id, image=self.green_circle_photo)
 
+        # Comprobación de si hay puntos restantes
         if current_corner <= len(self.corner_images) - 1:
-            print("Red")
             img_id = self.corner_images[current_corner]
             self.canvas.itemconfig(img_id, image=self.red_circle_photo)
+            self.wait_for_user_input = True 
 
     def shut_down_calibration(self):
         self.calibration_running = False
@@ -201,8 +202,7 @@ class MainTab(Tab):
         if calibration_otuput == calibrate.CalibrationOutput.CALIBRATION_COMPLETED:
             self.on_calibration_completed()
         elif calibration_otuput == calibrate.CalibrationOutput.CORNER_COMPLETED:
-            self.update_corner_view()
-            self.wait_for_user_input = True        
+            self.update_corner_view()       
 
     # MARK: KEY EVENTS
     def key_pressed(self, event):
@@ -213,3 +213,4 @@ class MainTab(Tab):
             current_corner = self.calibrator_manager.current_calibration
             img_id = self.corner_images[current_corner]
             self.canvas.itemconfig(img_id, image=self.orange_circle_photo)
+            self.wait_for_user_input = False
