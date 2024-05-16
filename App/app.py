@@ -4,7 +4,7 @@ import sys
 sys.path.append('./GazeTracking-master/')
 sys.path.append('./EyeTracker/')
 
-from App.Tabs import mainTab
+from App.Tabs import calibrationTab
 from App.Tabs import videoPlayerTab
 from EyeTracker.eyeTracker import EyeTracker
 
@@ -42,7 +42,7 @@ class App:
         self.frame2 = ttk.Frame(self.root, padding = 0)
 
         # Agregar las pestañas al notebookªª
-        self.notebook.add(self.frame1, text="Main")
+        self.notebook.add(self.frame1, text="Calibration")
         self.notebook.add(self.frame2, text="Video Player")
 
         #Los hacemos pack
@@ -50,7 +50,7 @@ class App:
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
         
         # Creamos las clases que representan cada pestaña de la App
-        self.mainTab = mainTab.MainTab(self.frame1, self.eyeTracker, self) 
+        self.mainTab = calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self) 
         self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.frame2)
         
         self.mainTab.set_up()

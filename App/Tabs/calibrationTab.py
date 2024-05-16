@@ -14,7 +14,7 @@ from Events.jsonSerializer import JsonSerializer
 from Events.eyeTrackingEvent import EyeTrackingEvent
 from Events.calibrationEvent import CalibrationEvent
 
-class MainTab(Tab):
+class CalibrationTab(Tab):
 
     cam_img_id = None 
     calibration_running = None
