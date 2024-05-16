@@ -46,35 +46,35 @@ class dataAnalyzer:
         map = sns.heatmap(heatData,cmap='viridis', annot=True,  square=True, linewidths=.5)
         map.set_title('Mapa de calor según cantidad de veces que se ha mirado un punto', fontsize=12)
         plt.show()
-    #def readData(nameFile):
-    # Cargar el JSON desde un archivo
-    with open('event_1715799433.json', 'r') as json_data:
-        data = json.load(json_data)
-    eyePosData = data["Events"]
-    print (eyePosData[0])
-    initTime = math.trunc(eyePosData[0]['timestamp'])
-    print(initTime)
-    startDataTime = 0
-    endDataTime= len(eyePosData)
+    def readData(nameFile):
+        # Cargar el JSON desde un archivo
+        with open(nameFile, 'r') as json_data:
+            data = json.load(json_data)
+        eyePosData = data["Events"]
+        print (eyePosData[0])
+        initTime = math.trunc(eyePosData[0]['timestamp'])
+        print(initTime)
+        startDataTime = 0
+        endDataTime= len(eyePosData)
 
-    #Avanzar hasta la primera marca de tiempo que se necesita
-    for j in range(0, len(eyePosData)-1):
-        if(math.trunc(eyePosData[j]['timestamp']) >= (initTime + startDataTime)):
-            break
-    posicionespochas=0
-    totalPositions= []
-    for k in range(j,len(eyePosData)-1):
-        print(k)
-        if(math.trunc(eyePosData[k]['timestamp']) > (initTime + endDataTime)):
-            break
-        # No meter las posiciones de x e y que se salgan de la pantalla
-        if(eyePosData[k]['posX'] > 1 or eyePosData[k]['posX'] < 0 or eyePosData[k]['posY'] > 1 or eyePosData[k]['posY'] < 0):
-            posicionespochas+=1
-            continue
-        totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
-        print(posicionespochas)
-    createTimeHeatMap(totalPositions)
-    createCountHeatMap(totalPositions)
+        #Avanzar hasta la primera marca de tiempo que se necesita
+        for j in range(0, len(eyePosData)-1):
+            if(math.trunc(eyePosData[j]['timestamp']) >= (initTime + startDataTime)):
+                break
+        posicionespochas=0
+        totalPositions= []
+        for k in range(j,len(eyePosData)-1):
+            print(k)
+            if(math.trunc(eyePosData[k]['timestamp']) > (initTime + endDataTime)):
+                break
+            # No meter las posiciones de x e y que se salgan de la pantalla
+            if(eyePosData[k]['posX'] > 1 or eyePosData[k]['posX'] < 0 or eyePosData[k]['posY'] > 1 or eyePosData[k]['posY'] < 0):
+                posicionespochas+=1
+                continue
+            totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
+            print(posicionespochas)
+        createTimeHeatMap(totalPositions)
+        createCountHeatMap(totalPositions)
 
 
 

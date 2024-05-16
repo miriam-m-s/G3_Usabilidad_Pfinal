@@ -1,0 +1,31 @@
+{
+ "Events": [
+{
+  "Timestamp": 1715854214,
+  "event_ID": "c2dfb5d3-248e-4645-9f5a-329825cc7ec8",
+  "session_ID": "",
+  "event_type": "ProgressionEvent",
+  "type": "SessionStartEvent"
+},
+{
+  "Timestamp": 1715854235,
+  "event_ID": "c2cb0935-71ef-4905-aeea-cc09343d5dae",
+  "session_ID": "",
+  "event_type": "ProgressionEvent",
+  "type": "MissionStartEvent"
+},
+{
+  "Timestamp": 1715854241,
+  "event_ID": "0055a0d6-b4d3-405e-b0a4-ccd9bdb168d2",
+  "session_ID": "",
+  "event_type": "ProgressionEvent",
+  "type": "MissionEndEvent"
+},
+{
+  "Timestamp": 1715854246,
+  "event_ID": "837d762c-775b-40fc-af7a-b7646efd49b8",
+  "session_ID": "",
+  "event_type": "ProgressionEvent",
+  "type": "SessionEndEvent"
+},
+{}]}
