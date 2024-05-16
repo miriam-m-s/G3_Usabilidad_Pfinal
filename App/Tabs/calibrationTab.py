@@ -7,8 +7,11 @@ from PIL import Image, ImageTk
 from EyeTracker import calibrate
 from App.AppState import instructions
 from App.Tabs.tab import Tab
+from App.Utils import jsonUtils
+from App.appConsts import Consts
 
 import time
+import json
 from Events.eventSender import EventSender
 from Events.jsonSerializer import JsonSerializer
 from Events.eyeTrackingEvent import EyeTrackingEvent
@@ -28,6 +31,8 @@ class CalibrationTab(Tab):
     wait_for_user_input = False
 
     circle_width = 90
+    max_screen_w = 0
+    max_screen_h = 0
 
     def __init__(self, tab, eyeTracker, app):
         self.tab = tab
@@ -128,9 +133,9 @@ class CalibrationTab(Tab):
         self.app.root.after(400, self.set_up_window_calibration)
 
     def set_up_window_calibration(self):
-        w = self.app.root.winfo_screenwidth()
-        h = self.app.root.winfo_screenheight()
-        self.canvas.config(width=w, height=h)
+        self.max_screen_w = self.app.root.winfo_screenwidth()
+        self.max_screen_h = self.app.root.winfo_screenheight()
+        self.canvas.config(width=self.max_screen_w, height=self.max_screen_h)
 
         self.corner_coords = self.calibrator_manager.get_corner_calibration_order_position()
         self.calibrator_manager.get_current_relative_corner() 
@@ -138,13 +143,13 @@ class CalibrationTab(Tab):
 
         self.corner_images = []
         for corner in self.corner_coords:
-            x = corner[0] * w
-            y = corner[1] * h
+            x = corner[0] * self.max_screen_w
+            y = corner[1] * self.max_screen_h
             #self.canvas.create_image(0, 0, anchor="nw", image=self.background_img)
             self.corner_images.append(self.canvas.create_image(x, y, anchor="center",image = self.gray_circle_photo))
 
-        calEvent=CalibrationEvent(timestamp=time.time(),width=w,height=h)
-        calEvent.set_coords(w,h)        
+        calEvent=CalibrationEvent(timestamp=time.time(),width=self.max_screen_w,height=self.max_screen_h)
+        calEvent.set_coords(self.max_screen_w,self.max_screen_h)        
         self.eventSender.add_event(calEvent)
         self.update_corner_view()
         
@@ -157,7 +162,8 @@ class CalibrationTab(Tab):
 
         left, right, up, bottom = self.mean_coordinates()
         self.eventSender.set_calibration_points(left, right, up, bottom)
-       
+        self.save_calibration(left, right, up, bottom)
+
 
     def update_corner_view(self):
         current_corner = self.calibrator_manager.current_calibration
@@ -232,3 +238,15 @@ class CalibrationTab(Tab):
             img_id = self.corner_images[current_corner]
             self.canvas.itemconfig(img_id, image=self.orange_circle_photo)
             self.wait_for_user_input = False
+
+    def save_calibration(self, left, right, up, bottom):
+        jsonMap = {
+            "left": left,
+            "right": right,
+            "up": up,
+            "bottom": bottom,
+            "screen_width": self.max_screen_w,
+            "screen_height": self.max_screen_h
+        }
+        jsonUtils.save_json_into_file(Consts.APP_DATA_PATH, jsonMap)
+        

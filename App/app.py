@@ -6,6 +6,7 @@ sys.path.append('./EyeTracker/')
 
 from App.Tabs import calibrationTab
 from App.Tabs import videoPlayerTab
+from App.Tabs import recordTab
 from EyeTracker.eyeTracker import EyeTracker
 
 import time
@@ -20,6 +21,8 @@ class App:
 
     init_window_width = 1200
     init_window_height = 650
+
+    tabs = []
 
     def init(self):
         #Creación de la aplicación raíz
@@ -40,23 +43,25 @@ class App:
         #Crear pestañas
         self.frame1 = ttk.Frame(self.root, padding = 0)
         self.frame2 = ttk.Frame(self.root, padding = 0)
+        self.frame3 = ttk.Frame(self.root, padding = 0)
 
         # Agregar las pestañas al notebookªª
         self.notebook.add(self.frame1, text="Calibration")
         self.notebook.add(self.frame2, text="Video Player")
+        self.notebook.add(self.frame3, text="Record")
 
         #Los hacemos pack
         self.notebook.pack(fill="both", expand=True)
-        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
         
         # Creamos las clases que representan cada pestaña de la App
-        self.mainTab = calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self) 
-        self.videoPlayerTab = videoPlayerTab.VideoPlayerTab(self.frame2)
-        
-        self.mainTab.set_up()
-        self.videoPlayerTab.set_up()  
+        self.tabs.append(calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self))
+        self.tabs.append(videoPlayerTab.VideoPlayerTab(self.frame2))
+        self.tabs.append(recordTab.RecordTab(self.frame3))
 
-        self.root.bind    ('<Key>', self.key_pressed)  
+        self.set_up_tabs_()
+
+        self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
+        self.root.bind('<Key>', self.key_pressed)  
 
     def set_fullscreen(self, fullscren):
         self.root.attributes("-fullscreen", fullscren)
@@ -79,12 +84,8 @@ class App:
         selectedTab = self.notebook.select()
         id = self.notebook.index(selectedTab)  
 
-        if id == 0:
-            self.currentTab = self.mainTab
-        elif id == 1:
-            self.currentTab = self.videoPlayerTab
-        
-        #self.currentTab.onEntryTab()
+        self.currentTab = self.tabs[id]
+        self.currentTab.on_entry_tab()
     
     def __update(self):
         currentTime = time.time()
@@ -107,3 +108,8 @@ class App:
     def key_pressed(self, event):
         if self.currentTab is not None:
             self.currentTab.key_pressed(event)
+
+    # MARK: PRIVATE METHODS
+    def set_up_tabs_(self):
+        for tab in self.tabs:
+            tab.set_up() 
