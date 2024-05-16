@@ -22,6 +22,8 @@ class EventSender:
         with open(self.filename, 'w') as file:
             file.write(self.serializer.init_file_format())
     def set_end(self):
+        self.save_events()
+        self.last_save_time = time.time()
         with open(self.filename, 'a') as file:
             file.write(self.serializer.end_file_format())
         self.events = []       
