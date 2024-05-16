@@ -56,10 +56,12 @@ class MainTab(Tab):
 
         self.calibrator_manager = calibrate.CalibratorManager()
         
+        events_interval_secs= 5 #Intervalo que indica que cada 5 segundos se deben guardar los eventos en un archivo
+        
         #Creacion del EventSender y JSONSerializer
         self.serializer = JsonSerializer()
         left, right, up, bottom = self.mean_coordinates()
-        self.eventSender = EventSender(self.serializer, 5, left, right, up,bottom) 
+        self.eventSender = EventSender(self.serializer, events_interval_secs, left, right, up,bottom) 
 
     def mean_coordinates(self):
         left=(self.calibrator_manager.getTopLeft()[0]+self.calibrator_manager.getBottomLeft()[0])/2
