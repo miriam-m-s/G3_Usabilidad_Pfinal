@@ -8,6 +8,7 @@ from App.Tabs import calibrationTab
 from App.Tabs import videoPlayerTab
 from App.Tabs import recordTab
 from EyeTracker.eyeTracker import EyeTracker
+from EyeTracker import calibrate
 
 import time
 
@@ -37,6 +38,8 @@ class App:
         self.eyeTracker = EyeTracker()
         self.eyeTracker.setUp()
 
+        self.calibrator_manager = calibrate.CalibratorManager()
+
         # Creamos el notebok que manejará las pestañas
         self.notebook = ttk.Notebook(self.root)
 
@@ -54,9 +57,9 @@ class App:
         self.notebook.pack(fill="both", expand=True)
         
         # Creamos las clases que representan cada pestaña de la App
-        self.tabs.append(calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self))
+        self.tabs.append(calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self, self.calibrator_manager))
         self.tabs.append(videoPlayerTab.VideoPlayerTab(self.frame2))
-        self.tabs.append(recordTab.RecordTab(self.frame3))
+        self.tabs.append(recordTab.RecordTab(self.frame3, self.eyeTracker, self.calibrator_manager))
 
         self.set_up_tabs_()
 

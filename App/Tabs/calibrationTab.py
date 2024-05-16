@@ -12,8 +12,6 @@ from App.appConsts import Consts
 
 import time
 import json
-from Events.eventSender import EventSender
-from Events.jsonSerializer import JsonSerializer
 from Events.eyeTrackingEvent import EyeTrackingEvent
 from Events.calibrationEvent import CalibrationEvent
 
@@ -34,11 +32,12 @@ class CalibrationTab(Tab):
     max_screen_w = 0
     max_screen_h = 0
 
-    def __init__(self, tab, eyeTracker, app):
+    def __init__(self, tab, eyeTracker, app, calibrator_manager):
         self.tab = tab
         self.eyeTracker = eyeTracker
         self.playing = False
         self.app = app 
+        self.calibrator_manager = calibrator_manager
  
     def set_up(self):
         self.canvas = tk.Canvas(self.tab, width=1000, height=600)
@@ -58,23 +57,8 @@ class CalibrationTab(Tab):
         
         self.instructions = instructions.CalibrationInstructions()
         self.load_images()
+        
 
-        self.calibrator_manager = calibrate.CalibratorManager()
-        
-        events_interval_secs= 5 #Intervalo que indica que cada 5 segundos se deben guardar los eventos en un archivo
-        
-        #Creacion del EventSender y JSONSerializer
-        self.serializer = JsonSerializer()
-        left, right, up, bottom = self.mean_coordinates()
-        self.eventSender = EventSender(self.serializer, events_interval_secs, left, right, up,bottom) 
-
-    def mean_coordinates(self):
-        left=(self.calibrator_manager.getTopLeft()[0]+self.calibrator_manager.getBottomLeft()[0])/2
-        right=(self.calibrator_manager.getTopRight()[0]+self.calibrator_manager.getBottomRight()[0])/2
-        up=(self.calibrator_manager.getTopLeft()[1]+self.calibrator_manager.getTopRight()[1])/2
-        bottom=(self.calibrator_manager.getBottomLeft()[1]+self.calibrator_manager.getBottomRight()[1])/2
-        return left,right,up,bottom #Enviar eventos cada 5 segundos
-        
     def load_images(self):
         gray_image = Image.open(self.gray_circle_path)
         red_image = Image.open(self.red_circle_path)
@@ -160,8 +144,7 @@ class CalibrationTab(Tab):
 
         self.stop()
 
-        left, right, up, bottom = self.mean_coordinates()
-        self.eventSender.set_calibration_points(left, right, up, bottom)
+        left, right, up, bottom = self.calibrator_manager.mean_coordinates()
         self.save_calibration(left, right, up, bottom)
 
 
@@ -197,16 +180,7 @@ class CalibrationTab(Tab):
         if self.playing == False: #or self.calibration_running para no mostrarlo en la calibración. Hay que borrar el id de la imagen también
             return
         
-        frame, horizontal_gaze, vertical_gaze = self.eyeTracker.getFrame()
-        
-        #TODO: enviar eventos de seguimiento ocular
-        if horizontal_gaze is not None and vertical_gaze is not None:
-            #todo: media x e y de las pupilas
-            normX, normY = self.eventSender.normalize_events(horizontal_gaze, vertical_gaze)
-            event=EyeTrackingEvent(timestamp=time.time(),x=horizontal_gaze,y=vertical_gaze)
-            event.set_coords(normX, normY)
-            self.eventSender.add_event(event)
-
+        frame, horizontal_gaze, vertical_gaze = self.eyeTracker.getFrame()     
         
         self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
         self.cam_img_id = self.canvas.create_image(0, 100, image=self.photo, anchor=tk.NW)

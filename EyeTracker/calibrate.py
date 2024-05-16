@@ -59,7 +59,7 @@ class Calibrator :
         # esto se puede hacer mandando como parámetro de entrada una función de validación desde el Manager, que compruebe
         # bajo que casos podemos aceptar datos, por ejemplo.
 
-      
+    
 
         self.collected_data.append((horizontal_gaze, vertical_gaze))
 
@@ -182,3 +182,9 @@ class CalibratorManager :
     def get_corner_calibration_order_position(self):
         return [self.corner_relative_positions[ScreenPositions(position)] for position in self.positions]
     
+    def mean_coordinates(self):
+        left=(self.getTopLeft()[0]+self.getBottomLeft()[0])/2
+        right=(self.getTopRight()[0]+self.getBottomRight()[0])/2
+        up=(self.getTopLeft()[1]+self.getTopRight()[1])/2
+        bottom=(self.getBottomLeft()[1]+self.getBottomRight()[1])/2
+        return left,right,up,bottom
