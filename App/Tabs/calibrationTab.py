@@ -39,14 +39,14 @@ class CalibrationTab(Tab):
         self.canvas = tk.Canvas(self.tab, width=1000, height=600)
         self.canvas.pack()
 
-        self.play_button = ttk.Button(self.canvas, text="Play", command=self.play, takefocus=False)
+        #self.play_button = ttk.Button(self.canvas, text="Play", command=self.play, takefocus=False)
         self.calibrate_button = ttk.Button(self.canvas, text="Calibrate", command = self.start_calibration, takefocus=False)
         self.stop_button = ttk.Button(self.canvas, text="Stop", command=self.stop, takefocus=False)
         self.instructions_button = ttk.Button(self.canvas, text="Instructions", command=self.show_instructions, takefocus=False)
         
         x = self.app.init_window_width * 0.45
         y = 10
-        self.play_button.place(x=x, y=y)
+        #self.play_button.place(x=x, y=y)
         self.calibrate_button.place(x=x, y=y + 30)
         self.stop_button.place(x=x, y=y + 60)
         self.instructions_button.place(x=x, y = y + 90)
@@ -112,14 +112,14 @@ class CalibrationTab(Tab):
     # MARK: CALIBRATION
 
     def start_calibration(self):
-        if not self.playing:
-            self.play()
+        if self.playing:
+            return
+        self.play()
 
-        self.play_button.place_forget()
+        #self.play_button.place_forget()
         self.instructions_button.place_forget()
         self.calibrate_button.place_forget()
 
-        print("Caballo")
         self.calibrator_manager.reset()
         self.app.set_fullscreen(True)
         self.calibration_running = True
@@ -152,7 +152,9 @@ class CalibrationTab(Tab):
         self.app.set_fullscreen(False)
         self.calibrator_manager.get_calibration_map()
         print("Calibración completa")
-        self.shut_down_calibration()
+
+        self.stop()
+
         left, right, up, bottom = self.mean_coordinates()
         self.eventSender.set_calibration_points(left, right, up, bottom)
        
@@ -179,7 +181,7 @@ class CalibrationTab(Tab):
     
         x = self.app.init_window_width * 0.45
         y = 10
-        self.play_button.place(x=x, y=y)
+        #self.play_button.place(x=x, y=y)
         self.calibrate_button.place(x=x, y=y + 30)
         self.stop_button.place(x=x, y=y + 60)
         self.instructions_button.place(x=x, y = y + 90)

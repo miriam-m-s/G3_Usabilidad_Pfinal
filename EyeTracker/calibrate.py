@@ -49,7 +49,6 @@ class Calibrator :
     def reset(self):
         self.collected_data = []
         self.current_iteration = 0
-        print("Reset")
 
     def collect_data(self, horizontal_gaze,vertical_gaze) :
 
