@@ -6,9 +6,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import math 
 class dataAnalyzer:
-    
     #Crea un mapa de calor según el tiempo que se ha mirado a cada posición de la pantalla
-    def createTimeHeatMap(coords):
+    def createTimeHeatMap(coords, w,h):
         # dataframe para el mapa de calor
         heatData = pd.DataFrame([[0]*21]*11)
         xCoord=0
@@ -27,12 +26,14 @@ class dataAnalyzer:
                 yCoord=10
             heatData.iat[yCoord,xCoord] +=1 
         #Creación del heatmap
-        plt.figure(figsize=(10,10))
+        figsize = (w / 100, h / 100) 
+        plt.figure(figsize=figsize, dpi=100)
+        
         map = sns.heatmap(heatData,cmap='coolwarm', annot=True,  square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según tiempo que se ha mirado a cada punto', fontsize =16)
         plt.show()
     #Crea un mapa de calor según cuantas veces se ha mirado cada posición de la pantalla
-    def createCountHeatMap(coords):
+    def createCountHeatMap(coords, w, h):
         # dataframe para el mapa de calor
         heatData = pd.DataFrame([[0]*21]*11)
         xCoord=0
@@ -57,8 +58,9 @@ class dataAnalyzer:
             heatData.iat[yCoord,xCoord] += 1
             prevXcoord = xCoord
             prevYcoord = yCoord
-        #Creación del heatmap
-        plt.figure(figsize=(10,20))
+        #creación del heatmap
+        figsize = (w / 100, h / 100) 
+        plt.figure(figsize=figsize, dpi=100)
         map = sns.heatmap(heatData,cmap='viridis', annot=True,  square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según cantidad de veces que se ha mirado un punto', fontsize=12)
         plt.show()
@@ -72,6 +74,9 @@ class dataAnalyzer:
         
         startDataTime = init
         durationData= duration
+        width = eyePosData[0]['width']
+        height = eyePosData[0]['height']
+        
         #Avanzar hasta la primera marca de tiempo que se necesita
         for j in range(1, len(eyePosData)-1):
             if(math.trunc(eyePosData[j]['timestamp']) >= (initTime + startDataTime)):
@@ -84,7 +89,7 @@ class dataAnalyzer:
             #if(eyePosData[k]['posX'] > 1 or eyePosData[k]['posX'] < 0 or eyePosData[k]['posY'] > 1 or eyePosData[k]['posY'] < 0):
                 #continue
             totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
-        return totalPositions
+        return totalPositions, width, height
 
 
 
