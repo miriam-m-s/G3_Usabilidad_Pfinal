@@ -9,14 +9,22 @@ class EventSender:
         self.right = right
         self.bottom = bottom
         self.up = up
-        
+  
         #Creacion de carpeta para eventos
         self.tracked_events_folder = "TrackedEvents"
+        self.filename= f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
         if not os.path.exists(self.tracked_events_folder):
             os.makedirs(self.tracked_events_folder)
             
         self.last_save_time = time.time()
-            
+    def set_start(self):
+        self.filename= f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
+        with open(self.filename, 'w') as file:
+            file.write(self.serializer.init_file_format())
+    def set_end(self):
+        with open(self.filename, 'a') as file:
+            file.write(self.serializer.end_file_format())
+        self.events = []       
     def set_calibration_points(self, left, right, up,bottom):
         self.left = left
         self.right = right
@@ -31,15 +39,11 @@ class EventSender:
             self.save_events()
             self.last_save_time = time.time()
 
-    def save_events(self):
-        
-        filename = f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
-        with open(filename, 'w') as file:
-            file.write(self.serializer.init_file_format())
+    def save_events(self):        
+        with open(self.filename, 'a') as file:
             for event in self.events:
                 file.write(self.serializer.serialize(event))
-            file.write(self.serializer.end_file_format())
-        self.events = []
+            
     
         
     def normalize_events(self,coordX,coordY):
