@@ -44,7 +44,7 @@ class EventSender:
         with open(self.filename, 'a') as file:
             for event in self.events:
                 file.write(self.serializer.serialize(event))
-         self.events = []   
+        self.events = []   
             
     
         
