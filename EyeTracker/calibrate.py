@@ -39,7 +39,7 @@ class Calibrator :
 
     # Recogemos 20 datos por cada punto, y sacamos la media
 
-    data_to_collect = 20
+    data_to_collect = 50
 
 
     collected_data = [] 
