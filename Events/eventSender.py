@@ -39,10 +39,12 @@ class EventSender:
             self.save_events()
             self.last_save_time = time.time()
 
-    def save_events(self):        
+    def save_events(self):   
+
         with open(self.filename, 'a') as file:
             for event in self.events:
                 file.write(self.serializer.serialize(event))
+         self.events = []   
             
     
         
