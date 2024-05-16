@@ -51,7 +51,7 @@ class dataAnalyzer:
             if(yCoord<0):
                 yCoord =0
             if(yCoord>10):
-                yCoord=10
+                yCoord = 10
             #Comprueba que la posición no sea igual a la anterior para añadirla al mapa
             if(prevXcoord == xCoord and prevYcoord == yCoord):
                 continue
