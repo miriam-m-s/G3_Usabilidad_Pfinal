@@ -55,9 +55,10 @@ class VideoRecorder:
 
         with open(filePath, 'r') as jsonFile:
             events = json.load(jsonFile)["Events"]
+        events = [event for event in events[:-1] if event["id"] == 0] 
 
         thread = threading.Thread(target=self.__processVideo, 
-            args=(self.tempVideoIdx, self.startTime, fps, events[:-1]))
+            args=(self.tempVideoIdx, self.startTime, fps, events))
         thread.start()
 
     def __setAvailableTempIdx(self):
