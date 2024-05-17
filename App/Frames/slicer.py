@@ -15,15 +15,16 @@ class Slicer:
         button_size = 3 
         ttk.Button(title_frame, text="X", width=button_size, 
                    command=lambda : tab.deleteSlicer(self)).pack(side=tk.LEFT)
-        tk.Entry(title_frame, text=tk.StringVar(value=name)).pack(side=tk.LEFT)
+        self.name = tk.Entry(title_frame, text=tk.StringVar(value=name))
+        self.name.pack(side=tk.LEFT)
 
         from_slice_frame = tk.Frame(self.frame)
         from_slice_frame.grid(row=1, column=0, sticky="w")
-        Slice(tab, from_slice_frame, "From:", 0)
+        self.from_slice = Slice(tab, from_slice_frame, "From:", 0)
 
         until_slice_frame = tk.Frame(self.frame)
         until_slice_frame.grid(row=1, column=1, sticky="w")
-        Slice(tab, until_slice_frame, "Until:", tab.videoPlayer.duration)
+        self.until_slice = Slice(tab, until_slice_frame, "Until:", tab.videoPlayer.duration)
 
 class Slice:
 
