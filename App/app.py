@@ -53,8 +53,8 @@ class App:
 
         # Agregar las pestañas al notebookªª
         self.notebook.add(self.frame1, text="Calibration")
-        self.notebook.add(self.frame2, text="Video Player")
-        self.notebook.add(self.frame3, text="Record")
+        self.notebook.add(self.frame2, text="Record")
+        self.notebook.add(self.frame3, text="Video Player")
         self.notebook.add(self.frame4, text="Results")
 
         #Los hacemos pack
@@ -65,8 +65,8 @@ class App:
 
         # Creamos las clases que representan cada pestaña de la App
         self.tabs.append(calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self, self.calibrator_manager))
-        self.tabs.append(videoPlayerTab.VideoPlayerTab(self.frame2))
-        self.tabs.append(recordTab.RecordTab(self.frame3, self.eyeTracker, self.calibrator_manager))
+        self.tabs.append(recordTab.RecordTab(self.frame2, self.eyeTracker, self.calibrator_manager))
+        self.tabs.append(videoPlayerTab.VideoPlayerTab(self.frame3))
         self.tabs.append(resultsTab.ResultsTab(self.frame4))
 
         self.set_up_tabs_()
