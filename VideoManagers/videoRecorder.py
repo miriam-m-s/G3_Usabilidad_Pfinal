@@ -15,7 +15,7 @@ class VideoRecorder:
     tempVideoIdx = None
     availableTempIndexes = []
 
-    videoPath = 'TrackedEvents/'
+    videoPath = 'UserTest/'
 
     def __init__(self):
 
@@ -23,13 +23,11 @@ class VideoRecorder:
         
         self.fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
-        if not os.path.exists(self.videoPath):
-            os.makedirs(self.videoPath)
 
-    def start(self,user_test_name):  
+    def start(self,user_test_path):  
 
         self.__setAvailableTempIdx()
-        self.out = cv2.VideoWriter(f'{self.videoPath}{user_test_name}/temp{self.tempVideoIdx}.mp4', 
+        self.out = cv2.VideoWriter(f'{user_test_path}/temp{self.tempVideoIdx}.mp4', 
             self.fourcc, 60, (self.width, self.height))
 
         self.nFrames = 0
