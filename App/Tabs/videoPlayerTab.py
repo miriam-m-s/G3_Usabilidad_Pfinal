@@ -9,6 +9,7 @@ from PIL import Image, ImageTk
 from App.Frames import slicer
 from VideoManagers.videoPlayer import VideoPlayer
 from App.Tabs.tab import Tab
+import json
 
 lastRecording = None
 
@@ -48,6 +49,9 @@ class VideoPlayerTab(Tab):
             command=self.__loadVideo).pack(side=tk.LEFT) 
         ttk.Button(load_video_frame, text="Load last recording",  
             command=self.__loadLastRecording).pack(side=tk.LEFT)
+
+        ttk.Button(self.tab, text="Save slices",  
+            command=self.__saveSlices).grid(row=0, column=1, sticky="w")
 
         self.canvas = tk.Canvas(self.tab, width=self.width, height=self.height)
         self.canvas.grid(row=1, column=0)
@@ -91,7 +95,7 @@ class VideoPlayerTab(Tab):
         ToolTip(self.videoFrameLabel, msg="Fotograma", delay=0.5)
 
         self.slicer_frame = tk.Frame(self.tab)
-        self.slicer_frame.grid(row=1, column=1, sticky="n")
+        self.slicer_frame.grid(row=1, column=1, sticky="nw")
 
         self.add_button_frame = tk.Frame(self.slicer_frame)
         self.add_button_frame.pack(side=tk.TOP, anchor="w")  
@@ -216,6 +220,27 @@ class VideoPlayerTab(Tab):
 
     def __MMMSSMMM(self):
         return self.MMMSSMMM(self.currentTime)
+    
+    def __saveSlices(self):
+
+        if not self.slicerList:
+            messagebox.showerror("Error", "You have not created any slice")
+            return
+            
+        data = []
+
+        for slice in self.slicerList: 
+            data.append({
+                "Name": slice.name.get(),
+                "From": slice.from_slice.time,
+                "Until": slice.until_slice.time
+            })
+
+        jsonData = json.dumps({"Slices" : data}, indent=4)
+        with open('data.json', 'w') as archivo:
+            archivo.write(jsonData)
+
+
       
 
 
