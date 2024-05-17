@@ -113,7 +113,7 @@ class CalibrationTab(Tab):
         self.app.set_fullscreen(True)
         self.calibration_running = True
         self.wait_for_user_input = True
-
+       
         self.app.root.after(400, self.set_up_window_calibration)
 
     def set_up_window_calibration(self):

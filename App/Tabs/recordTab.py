@@ -28,7 +28,12 @@ class RecordTab(Tab):
 
     def set_up(self):
         self.canvas = tk.Canvas(self.tab, width=600, height=500)
-
+     
+        self.label = ttk.Label(self.tab, text="Insert name of test:")
+        self.label.pack(pady=10)
+        
+        self.entry = ttk.Entry(self.tab)
+        self.entry.pack(pady=10)
         self.play_button = ttk.Button(self.tab, text="Play", command=self.play, takefocus=False)
         self.stop_button = ttk.Button(self.tab, text="Stop", command = self.stop, takefocus=False)
         self.warning_label = ttk.Label(self.tab, text="Eye tracker sin calibrar o mal calibrado", foreground="red")
@@ -36,7 +41,7 @@ class RecordTab(Tab):
         self.serializer = JsonSerializer()
         self.eventSender = EventSender(self.serializer, self.events_interval_secs) 
         self.videoPlayer = VideoRecorder()    
-
+   
     def show_buttons(self):
         self.warning_label.pack_forget()
         self.play_button.pack()
@@ -52,6 +57,8 @@ class RecordTab(Tab):
     def play(self):
         if self.playing:
             return
+        user_input = self.entry.get()
+        print(user_input)
         self.eventSender.set_start()
         
         calEvent = CalibrationEvent(timestamp=time.time(),width=self.max_screen_w,height=self.max_screen_h)
