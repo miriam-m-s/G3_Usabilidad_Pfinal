@@ -32,6 +32,8 @@ class EventSender:
         with open(self.filename, 'a') as file:
             file.write(self.serializer.end_file_format())
         self.events = []   
+        #cerrar el archivo
+        self.filename.close()
 
     def set_calibration_points(self, *, left, right, up,bottom):
         self.left = left
