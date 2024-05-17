@@ -11,6 +11,7 @@ from App.appConsts import Consts
 from Events.eyeTrackingEvent import EyeTrackingEvent
 from Events.eventSender import EventSender
 from Events.jsonSerializer import JsonSerializer
+from VideoManagers.videoRecorder import VideoRecorder
 
 class RecordTab(Tab):
 
@@ -33,7 +34,7 @@ class RecordTab(Tab):
 
         self.serializer = JsonSerializer()
         self.eventSender = EventSender(self.serializer, self.events_interval_secs) 
-        
+        self.videoPlayer = VideoRecorder()    
 
     def show_buttons(self):
         self.warning_label.pack_forget()
@@ -51,6 +52,7 @@ class RecordTab(Tab):
         if self.playing:
             return
         self.eventSender.set_start()
+        self.videoPlayer.start()
         self.playing = True
         return
     
@@ -60,6 +62,7 @@ class RecordTab(Tab):
         
         self.canvas.delete(self.cam_img_id)
         self.eventSender.set_end()
+        self.videoPlayer.stop(self.eventSender.filename)
         self.playing = False
 
     def on_entry_tab(self):

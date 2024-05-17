@@ -17,13 +17,10 @@ class VideoPlayer:
         self.duration = self.dt * self.nFrames
         self.currentFrame = 0
 
-
         for f in range(self.nFrames, -1, -1):
             self.video.set(cv2.CAP_PROP_POS_FRAMES, f)
             ret, self.lastFrame = self.video.read()
             if ret: break
-
-        print(ret)
 
         print(f'Duración del video: {self.duration}')
         print(f'FPS: {int(self.video.get(cv2.CAP_PROP_FPS))}')

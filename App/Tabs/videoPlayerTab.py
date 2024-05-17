@@ -2,12 +2,15 @@ from tkinter import *
 from tkinter import ttk
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import messagebox
 import cv2
 from tktooltip import ToolTip
 from PIL import Image, ImageTk
 from App.Frames import slicer
-from ScreenRecorderTest.videoPlayer import VideoPlayer
+from VideoManagers.videoPlayer import VideoPlayer
 from App.Tabs.tab import Tab
+
+lastRecording = None
 
 class VideoPlayerTab(Tab):
 
@@ -27,7 +30,6 @@ class VideoPlayerTab(Tab):
     clipboard = 0
 
     videoPlayer = None
-    lastRecording = "./ScreenRecorderTest/video.mp4"
     loadNewVideo = False
 
     def __init__(self, tab):
@@ -153,8 +155,11 @@ class VideoPlayerTab(Tab):
         
 
     def __loadLastRecording(self):
-        self.filePath = self.lastRecording
-        self.loadNewVideo = True
+        if lastRecording is None:
+            messagebox.showerror("Error", "You haven't recorded any video yet")
+        else:
+            self.filePath = lastRecording
+            self.loadNewVideo = True
 
     def __checkEvents(self):
 
