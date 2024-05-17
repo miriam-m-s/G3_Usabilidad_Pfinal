@@ -81,7 +81,17 @@ class RecordTab(Tab):
         filepath=f"UserTests/{user_test}"
         if not os.path.exists(filepath):
             os.makedirs(filepath)
-        return filepath
+            return filepath
+        else:
+            version = 1
+            # Itera hasta encontrar un nombre de carpeta que no exista
+            while True:
+                new_path = f"{filepath}_v{version}"
+                if not os.path.exists(new_path):
+                    os.makedirs(new_path)
+                    return new_path
+                version += 1
+           
         
     
     def stop(self):
