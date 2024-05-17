@@ -4,17 +4,20 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
 import math 
 
 class dataAnalyzer:
 
     #Creación un mapa de calor según el tiempo que se ha mirado a cada posición de la pantalla
-    def createTimeHeatMap(coords, width,height):
+    def createTimeHeatMap(coords, width,height,subdivisions =(1,1), background=""):
         #Cálculo del aspect ratio de la pantalla para hacer el mapa de calor de ese tamaño
         gcd = math.gcd(height,width)
         w = width// gcd
         h=height //gcd
-
+        #Se crean tantas subdivisiones con respecto al aspect ratio como se soliciten(por defecto ninguna)
+        w=math.trunc(subdivisions[0] * w / subdivisions[1])
+        h=math.trunc(subdivisions[0] * h / subdivisions[1])
         #Dataframe para el mapa de calor, del tamaño del aspect ratio de la pantalla
         heatData = pd.DataFrame([[0]*(w+1)]*(h+1))
         xCoord=0
@@ -36,22 +39,32 @@ class dataAnalyzer:
             heatData.iat[yCoord,xCoord] +=1 
 
         #Creación del heatmap
-        plt.figure(figsize=(h,w))
-        map = sns.heatmap(heatData,cmap='coolwarm', annot=True, alpha=0.5, square=True, linewidths=.5, cbar=False)
+        figsize = (width / 100, height / 100) 
+        plt.figure(figsize=figsize, dpi=100)
+        #Si se le ha pasado una imagen mostrarla de fondo y poner el mapa semitransparente
+        a=1
+        if(background!=""):
+            img = mpimg.imread(background)
+            plt.imshow(img, extent=[0, w+1, h+1,0], aspect='auto')
+            a=0.5
+        map = sns.heatmap(heatData,cmap='coolwarm', annot=True, alpha=a, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según tiempo que se ha mirado a cada punto', fontsize =16)
         plt.show()
 
     #Creación un mapa de calor según cuantas veces se ha mirado cada posición de la pantalla
-    def createCountHeatMap(coords, width, height):
+    def createCountHeatMap(coords, width, height,subdivisions = (1,1), background=""):
         #Cálculo del aspect ratio de la pantalla para hacer el mapa de calor de ese tamaño
         gcd = math.gcd(height,width)
         w = width// gcd
-        h=height //gcd
+        h = height //gcd
+        #Se crean tantas subdivisiones con respecto al aspect ratio como se soliciten(por defecto ninguna)
+        w=math.trunc(subdivisions[0] * w / subdivisions[1])
+        h=math.trunc(subdivisions[0] * h / subdivisions[1])
+
         #Creación del dataframe para el mapa de calor
         heatData = pd.DataFrame([[0]*(w+1)]*(h+1))
         xCoord = 0
         yCoord = 0
-
         #Se almacena la posición anterior para no repetir cuando se mira una vez durante más de un frame
         prevXcoord = -1
         prevYcoord = -1
@@ -77,8 +90,15 @@ class dataAnalyzer:
             prevYcoord = yCoord
 
         #Creación del heatmap
-        plt.figure(figsize=(h,w))
-        map = sns.heatmap(heatData,cmap='viridis', annot=True, alpha=0.5, square=True, linewidths=.5, cbar=False)
+        figsize = (width / 100, height / 100) 
+        plt.figure(figsize=figsize, dpi=100)
+        #Si se le ha pasado una imagen mostrarla de fondo y poner el mapa semitransparente
+        a = 1
+        if(background!=""):
+            img = mpimg.imread(background)
+            plt.imshow(img, extent=[0, w+1, h+1,0], aspect='auto')
+            a = 0.5
+        map = sns.heatmap(heatData,cmap='viridis', annot=True, alpha=a, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según cantidad de veces que se ha mirado un punto', fontsize=12)
         plt.show()
         
