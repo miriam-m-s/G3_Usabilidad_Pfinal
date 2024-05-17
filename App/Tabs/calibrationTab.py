@@ -132,9 +132,6 @@ class CalibrationTab(Tab):
             #self.canvas.create_image(0, 0, anchor="nw", image=self.background_img)
             self.corner_images.append(self.canvas.create_image(x, y, anchor="center",image = self.gray_circle_photo))
 
-        calEvent=CalibrationEvent(timestamp=time.time(),width=self.max_screen_w,height=self.max_screen_h)
-        calEvent.set_coords(self.max_screen_w,self.max_screen_h)        
-        self.eventSender.add_event(calEvent)
         self.update_corner_view()
         
     def on_calibration_completed(self):

@@ -8,6 +8,7 @@ import cv2
 import time
 from App.Utils import jsonUtils
 from App.appConsts import Consts
+from Events.calibrationEvent import CalibrationEvent
 from Events.eyeTrackingEvent import EyeTrackingEvent
 from Events.eventSender import EventSender
 from Events.jsonSerializer import JsonSerializer
@@ -52,7 +53,13 @@ class RecordTab(Tab):
         if self.playing:
             return
         self.eventSender.set_start()
+        
+        calEvent = CalibrationEvent(timestamp=time.time(),width=self.max_screen_w,height=self.max_screen_h)
+        calEvent.set_coords(self.max_screen_w,self.max_screen_h)        
+        self.eventSender.add_event(calEvent)
+
         self.videoPlayer.start()
+
         self.playing = True
         return
     
@@ -97,5 +104,13 @@ class RecordTab(Tab):
         right = obj['right']
         left = obj['left']
         bottom = obj['bottom']
+        self.max_screen_w = obj['screen_width']
+        self.max_screen_h = obj['screen_height']
         self.eventSender.set_calibration_points(up=up, right=right, left=left, bottom=bottom) 
+
+    def on_close_app(self):
+        try:
+            self.stop()
+        except:
+            return
         

@@ -4,19 +4,23 @@ import json
 import math
 
 def analyzeJson(jsonName):
-    with open('AnalisisMonkey/Mision1/1715881367.json', 'r') as json_data:
+    with open(jsonName, 'r') as json_data:
             data = json.load(json_data)
-    data= data['Events']
-    #Busco hasta que encuentro el evento de inicio de misión
+
+    data = data['Events']
+    
     initMisionTime = 0
     endMisionTime = 0
-    initMisionTime = data[1]['Timestamp'] 
-    endMisionTime = data[2]['Timestamp']
-    startMisionTime = initMisionTime- data[0]['Timestamp']
 
-    misionDuration = endMisionTime - initMisionTime
-    #minutos y segundos para completar la partida
+    initMisionTimes = [event['Timestamp'] for event in data if 'type' in event and event['type'] == "MissionStartEvent"]
+    endMisionTimes = [event['Timestamp'] for event in data if 'type' in event and event['type'] == "MissionEndEvent"]
+
+    startMisionTime = initMisionTimes[0] - data[0]['Timestamp']
+
+    misionDuration = endMisionTimes[0] - initMisionTimes[0]
+    # minutos y segundos para completar la partida
     minutes = math.trunc(misionDuration / 60)
-    seconds= misionDuration % 60
-    print("El jugador ha tardado ",minutes," minutos y ", seconds , " segundos en completar la misión")
+    seconds = misionDuration % 60
+    print("El jugador ha tardado ", minutes," minutos y ", seconds , " segundos en completar la misión")
+
     return startMisionTime, misionDuration
