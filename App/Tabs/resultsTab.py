@@ -21,7 +21,7 @@ class ResultsTab(Tab):
     def on_entry_tab(self):   
         return
     
-    def update(self):
+    def update(self, dt):
         return
     
     def read_json(self, ruta_archivo):
