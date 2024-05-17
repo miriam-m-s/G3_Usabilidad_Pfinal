@@ -60,6 +60,9 @@ class App:
         #Los hacemos pack
         self.notebook.pack(fill="both", expand=True)
         
+       
+
+
         # Creamos las clases que representan cada pestaña de la App
         self.tabs.append(calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self, self.calibrator_manager))
         self.tabs.append(videoPlayerTab.VideoPlayerTab(self.frame2))
