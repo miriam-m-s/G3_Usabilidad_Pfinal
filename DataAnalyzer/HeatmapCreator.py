@@ -7,78 +7,87 @@ import matplotlib.pyplot as plt
 import math 
 
 class dataAnalyzer:
-    
-    #Crea un mapa de calor según el tiempo que se ha mirado a cada posición de la pantalla
-    def createTimeHeatMap(coords, w,h):
-        # dataframe para el mapa de calor
-        heatData = pd.DataFrame([[0]*21]*11)
+
+    #Creación un mapa de calor según el tiempo que se ha mirado a cada posición de la pantalla
+    def createTimeHeatMap(coords, width,height):
+        #Cálculo del aspect ratio de la pantalla para hacer el mapa de calor de ese tamaño
+        gcd = math.gcd(height,width)
+        w = width// gcd
+        h=height //gcd
+
+        #Dataframe para el mapa de calor, del tamaño del aspect ratio de la pantalla
+        heatData = pd.DataFrame([[0]*(w+1)]*(h+1))
         xCoord=0
         yCoord=0
-       #recorro todo el array para parsear las posiciones a casillas del dataframe
+
+        #Recorrido de todo el array para parsear las posiciones a casillas del dataframe
         for c in coords:
-            xCoord= math.trunc(c[0] * 20)
-            yCoord= math.trunc(c[1] * 10)
+            xCoord= math.trunc(c[0] * w)
+            yCoord= math.trunc(c[1] * h)
+            #Ajuste de las posiciones que se hayan salido de la pantalla
             if(xCoord < 0):
                 xCoord = 0
-            if(xCoord > 20):
-                xCoord = 20
+            if(xCoord > w):
+                xCoord = w
             if(yCoord<0):
                 yCoord =0
-            if(yCoord>10):
-                yCoord=10
+            if(yCoord>h):
+                yCoord=h
             heatData.iat[yCoord,xCoord] +=1 
+
         #Creación del heatmap
-        figsize = (w / 100, h / 100) 
-        plt.figure(figsize=figsize, dpi=100)
-        
-        map = sns.heatmap(heatData,cmap='coolwarm', annot=True,  square=True, linewidths=.5, cbar=False)
+        plt.figure(figsize=(h,w))
+        map = sns.heatmap(heatData,cmap='coolwarm', annot=True, alpha=0.5, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según tiempo que se ha mirado a cada punto', fontsize =16)
         plt.show()
 
-    #Crea un mapa de calor según cuantas veces se ha mirado cada posición de la pantalla
-    def createCountHeatMap(coords, w, h):
-        # dataframe para el mapa de calor
-        heatData = pd.DataFrame([[0]*21]*11)
+    #Creación un mapa de calor según cuantas veces se ha mirado cada posición de la pantalla
+    def createCountHeatMap(coords, width, height):
+        #Cálculo del aspect ratio de la pantalla para hacer el mapa de calor de ese tamaño
+        gcd = math.gcd(height,width)
+        w = width// gcd
+        h=height //gcd
+        #Creación del dataframe para el mapa de calor
+        heatData = pd.DataFrame([[0]*(w+1)]*(h+1))
         xCoord = 0
         yCoord = 0
+
+        #Se almacena la posición anterior para no repetir cuando se mira una vez durante más de un frame
         prevXcoord = -1
         prevYcoord = -1
 
-        # Recorro todo el array para parsear las posiciones a casillas del dataframe
+        #Se recorre todo el array para parsear las posiciones a casillas del dataframe
         for c in coords:
-            xCoord = math.trunc(c[0] * 20)
-            yCoord = math.trunc(c[1] * 10)
-
+            xCoord = math.trunc(c[0] * w)
+            yCoord = math.trunc(c[1] * h)
+            #Ajuste de las posiciones que se hayan salido de la pantalla
             if(xCoord < 0):
                 xCoord = 0
-            if(xCoord > 20):
-                xCoord = 20
+            if(xCoord > w):
+                xCoord = w
             if(yCoord < 0):
                 yCoord = 0
-            if(yCoord > 10):
-                yCoord = 10
-
-            # Comprueba que la posición no sea igual a la anterior para añadirla al mapa
+            if(yCoord > h):
+                yCoord = h
+            #Comprobación de que la posición no sea igual a la anterior para añadirla al mapa
             if(prevXcoord == xCoord and prevYcoord == yCoord):
                 continue
-
             heatData.iat[yCoord,xCoord] += 1
-
             prevXcoord = xCoord
             prevYcoord = yCoord
 
-        # Creación del heatmap
-        figsize = (w / 100, h / 100) 
-        plt.figure(figsize=figsize, dpi=100)
-        map = sns.heatmap(heatData,cmap='viridis', annot=True,  square=True, linewidths=.5, cbar=False)
+        #Creación del heatmap
+        plt.figure(figsize=(h,w))
+        map = sns.heatmap(heatData,cmap='viridis', annot=True, alpha=0.5, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según cantidad de veces que se ha mirado un punto', fontsize=12)
         plt.show()
         
     def readData(nameFile, init, duration):
-        # Cargar el JSON desde un archivo
+        #Carga del JSON desde el archivo que se le pida
         with open(nameFile, 'r') as json_data:
             data = json.load(json_data)
 
+        #Almacenamiento el tiempo que registra el primer evento
         eyePosData = data["Events"]
         initTime = math.trunc(eyePosData[1]['timestamp'])
         
@@ -87,18 +96,15 @@ class dataAnalyzer:
         width = eyePosData[0]['width']
         height = eyePosData[0]['height']
         
-        # Avanzar hasta la primera marca de tiempo que se necesita
+        #Avance hasta la primera marca de tiempo que se necesita
         for j in range(1, len(eyePosData)-1):
             if(math.trunc(eyePosData[j]['timestamp']) >= (initTime + startDataTime)):
                 break
-
+        #Se almacenan todas las posiciones x e y del json del tiempo pedido en una lista de pares (x,y)
         totalPositions = []
         for k in range(j, len(eyePosData)-1):
             if(math.trunc(eyePosData[k]['timestamp']) > (initTime + startDataTime + durationData) + 1):
                 break
-            # No meter las posiciones de x e y que se salgan de la pantalla
-            #if(eyePosData[k]['posX'] > 1 or eyePosData[k]['posX'] < 0 or eyePosData[k]['posY'] > 1 or eyePosData[k]['posY'] < 0):
-                #continue
             totalPositions.append((eyePosData[k]['posX'], eyePosData[k]['posY']))
 
         return totalPositions, width, height
