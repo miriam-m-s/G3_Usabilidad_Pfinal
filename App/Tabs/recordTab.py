@@ -6,6 +6,8 @@ from PIL import Image, ImageTk
 import cv2
 
 import time
+import re
+import uuid
 from App.Utils import jsonUtils
 from App.appConsts import Consts
 from Events.calibrationEvent import CalibrationEvent
@@ -57,18 +59,26 @@ class RecordTab(Tab):
     def play(self):
         if self.playing:
             return
-        user_input = self.entry.get()
-        print(user_input)
-        self.eventSender.set_start()
         
+        user_test_name=self.get_user_test_name()
+        self.eventSender.set_start(user_test_name)
         calEvent = CalibrationEvent(timestamp=time.time(),width=self.max_screen_w,height=self.max_screen_h)
         calEvent.set_coords(self.max_screen_w,self.max_screen_h)        
         self.eventSender.add_event(calEvent)
 
-        self.videoPlayer.start()
+        self.videoPlayer.start(user_test_name)
 
         self.playing = True
         return
+
+    def get_user_test_name(self):
+        user_test = self.entry.get()
+        user_test=re.sub(r'[^\w\s]', '', user_test).replace(' ', '')
+        print(user_test)
+        if not user_test:
+            user_test = str(uuid.uuid4())
+        return user_test
+        
     
     def stop(self):
         if not self.playing:
