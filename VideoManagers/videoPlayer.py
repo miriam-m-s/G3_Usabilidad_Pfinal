@@ -12,25 +12,31 @@ class VideoPlayer:
         self.width = int(self.video.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-        self.nFrames = int(self.video.get(cv2.CAP_PROP_FRAME_COUNT))
-        self.dt = 1 / self.video.get(cv2.CAP_PROP_FPS)
-        self.duration = self.dt * self.nFrames
-        self.currentFrame = 0
-
-        for f in range(self.nFrames, -1, -1):
-            self.video.set(cv2.CAP_PROP_POS_FRAMES, f)
+        for frame in range(int(self.video.get(cv2.CAP_PROP_FRAME_COUNT)), -1, -1):
+            self.video.set(cv2.CAP_PROP_POS_FRAMES, frame)
             ret, self.lastFrame = self.video.read()
             if ret: break
+
+        self.nFrames = frame + 1
+        self.dt = 1 / self.video.get(cv2.CAP_PROP_FPS)
+        self.duration = self.dt * self.nFrames
+        self.lastFrame = -1
 
         print(f'Duración del video: {self.duration}')
         print(f'FPS: {int(self.video.get(cv2.CAP_PROP_FPS))}')
         print(f'Frames totales {self.nFrames}')
 
     def getFrame(self, time):
-        self.currentFrame = int(time / self.dt) 
-        self.video.set(cv2.CAP_PROP_POS_FRAMES, self.currentFrame)
-        ret, frame = self.video.read()  
-        if not ret: 
-            frame = self.lastFrame
-            self.currentFrame = self.nFrames - 1
-        return ret, frame
+        currentFrame = int(time / self.dt)
+        if currentFrame != self.lastFrame and currentFrame < self.nFrames:         
+            self.video.set(cv2.CAP_PROP_POS_FRAMES, currentFrame)
+            self.lastFrame = currentFrame
+            return self.video.read()[1]      
+        return None
+    
+    def getFrameFromFrameIncrease(self, frameIncrease):
+        currentFrame = max(0, min(self.lastFrame + frameIncrease, self.nFrames - 1))
+        self.video.set(cv2.CAP_PROP_POS_FRAMES, currentFrame)
+        time = currentFrame * self.dt + self.dt / 10.0
+        self.lastFrame = currentFrame
+        return self.video.read()[1], time

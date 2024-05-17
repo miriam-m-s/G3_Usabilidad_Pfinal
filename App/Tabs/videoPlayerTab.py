@@ -20,7 +20,6 @@ class VideoPlayerTab(Tab):
     frameIncrease = 0
     timeIncrease = 0
     timeChange = -1
-    restartFlag = False
 
     playing = False
     sliding = False
@@ -120,19 +119,23 @@ class VideoPlayerTab(Tab):
 
         self.__checkEvents()
 
-        ret, frame = self.videoPlayer.getFrame(self.currentTime)
+        if self.frameIncrease != 0: 
+            frame, self.currentTime = self.videoPlayer.getFrameFromFrameIncrease(self.frameIncrease)
+            self.frameIncrease = 0        
+        else: frame = self.videoPlayer.getFrame(self.currentTime)
 
-        frame = cv2.resize(frame, (self.width, self.height))
-        self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
-        self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW)
-
-        if not ret:
+        if frame is not None:
+            frame = cv2.resize(frame, (self.width, self.height))
+            self.photo = ImageTk.PhotoImage(image=Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)))
+            self.canvas.create_image(0, 0, image=self.photo, anchor=tk.NW) 
+        
+        if self.currentTime >= self.videoPlayer.duration:
             self.playButton.config(text="I >")
             self.playing = False
 
         self.slider.set(self.currentTime)
-        self.videoTimeLabel.config(text=self.__MMMSSMMM())
-        self.videoFrameLabel.config(text=str(self.videoPlayer.currentFrame).zfill(9)) 
+        self.videoTimeLabel.config(text=self.__MMMSSMMM())  
+        self.videoFrameLabel.config(text=str(self.videoPlayer.lastFrame).zfill(9))    
 
     def __loadVideoChecker(self):     
         if self.loadNewVideo:
@@ -176,22 +179,12 @@ class VideoPlayerTab(Tab):
             self.currentTime = self.timeChange
             self.timeChange = -1
 
-        # Hay un bug con el primer y último frame (me da igual 🗿🚬)
-        if self.frameIncrease != 0:           
-            self.currentTime += self.frameIncrease * self.videoPlayer.dt
-            self.currentTime = max(0, min(self.currentTime, self.videoPlayer.duration))          
-            self.frameIncrease = 0
-
-        if self.restartFlag:
-            self.currentTime = 0
-            self.restartFlag = False
-
     def __play(self):
         self.playing = not self.playing
 
         if self.playing:
             if self.currentTime >= self.videoPlayer.duration:
-                self.restartFlag = True
+                self.timeChange = 0
             self.playButton.config(text="I I")      
         else:
             self.playButton.config(text="I >")       
