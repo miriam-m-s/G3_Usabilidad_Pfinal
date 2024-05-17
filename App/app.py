@@ -32,7 +32,8 @@ class App:
         self.root.geometry(f"{self.init_window_width}x{self.init_window_height}")
         #print(f"Width: {self.root.winfo_screenwidth()}, Height: {self.root.winfo_height()}")
         #self.root.resizable(False, False)
-        self.root.after(1000, self.__update)
+        self.root.after(800, self.__update)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         #sv_ttk.set_theme("dark")
 
         self.eyeTracker = EyeTracker()
@@ -116,3 +117,10 @@ class App:
     def set_up_tabs_(self):
         for tab in self.tabs:
             tab.set_up() 
+
+    def on_close(self):
+
+        if self.currentTab != None:
+            self.currentTab.on_close_app()
+
+        self.root.destroy()

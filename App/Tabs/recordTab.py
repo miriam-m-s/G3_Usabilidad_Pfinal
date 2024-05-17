@@ -103,4 +103,10 @@ class RecordTab(Tab):
         self.max_screen_w = obj['screen_width']
         self.max_screen_h = obj['screen_height']
         self.eventSender.set_calibration_points(up=up, right=right, left=left, bottom=bottom) 
+
+    def on_close_app(self):
+        try:
+            self.stop()
+        except:
+            return
         

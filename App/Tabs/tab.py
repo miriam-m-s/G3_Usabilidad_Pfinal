@@ -13,4 +13,7 @@ class Tab(ABC):
     def key_pressed(self, event):
         pass
 
+    def on_close_app(self):
+        pass
+
     
