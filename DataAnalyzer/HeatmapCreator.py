@@ -98,7 +98,7 @@ class dataAnalyzer:
             img = mpimg.imread(background)
             plt.imshow(img, extent=[0, w+1, h+1,0], aspect='auto')
             a = 0.5
-        map = sns.heatmap(heatData,cmap='viridis', annot=True, alpha=a, square=True, linewidths=.5, cbar=False)
+        map = sns.heatmap(heatData,cmap='coolwarm', annot=True, alpha=a, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según cantidad de veces que se ha mirado un punto', fontsize=12)
         plt.show()
         
