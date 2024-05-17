@@ -13,16 +13,17 @@ class EventSender:
         self.events = []
   
         #Creacion de carpeta para eventos
-        self.tracked_events_folder = "TrackedEvents"
-        self.filename= f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
-        if not os.path.exists(self.tracked_events_folder):
-            os.makedirs(self.tracked_events_folder)
+        # self.tracked_events_folder = "UserTest"
+        # self.filename= f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
+        # if not os.path.exists(self.tracked_events_folder):
+        #     os.makedirs(self.tracked_events_folder)
             
         self.last_save_time = time.time()
 
 
-    def set_start(self):
-        self.filename= f"{self.tracked_events_folder}/event_{int(time.time())}{self.serializer.get_file_extension()}"
+    def set_start(self,user_test_path):
+        
+        self.filename= f"{user_test_path}/event_{int(time.time())}{self.serializer.get_file_extension()}"
         with open(self.filename, 'w') as file:
             file.write(self.serializer.init_file_format())
 

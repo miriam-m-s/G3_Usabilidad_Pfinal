@@ -30,8 +30,9 @@ class ResultsTab(Tab):
         return obj
     
     def set_buttons(self):
-        self.load_questions_button = ttk.Button(self.scrolled_frame, text="Nada: Carmen Laforet")
-        self.load_questions_button.place(x=50, y = 50)
+        # self.load_questions_button = ttk.Button(self.scrolled_frame, text="Nada: Carmen Laforet")
+        # self.load_questions_button.place(x=50, y = 50)
+        return
 
     # def set_scrollbar(self):
     #     self.scrollbar = Scrollbar(self.tab, orient=VERTICAL, command=self.canvas.yview)
