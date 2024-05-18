@@ -15,7 +15,7 @@ class VerticalScroller:
         # configure the canvas
         self.canvas.configure(yscrollcommand=self.scrollbar.set)
         self.canvas.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-        self.scrolled_frame = ttk.Frame(self.canvas, width=1200, height=900)
+        self.scrolled_frame = ttk.Frame(self.canvas, width=800, height=200)
         self.canvas.create_window((0, 0), window=self.scrolled_frame, anchor="nw")
         self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
 

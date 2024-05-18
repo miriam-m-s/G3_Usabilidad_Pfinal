@@ -1,6 +1,7 @@
 from App.Tabs.tab import Tab
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
 import cv2
@@ -78,7 +79,7 @@ class RecordTab(Tab):
         print(user_test)
         if not user_test:
             user_test = str(uuid.uuid4())
-        filepath=f"UserTests/{user_test}"
+        filepath=f"{Consts.USER_TESTS_DIR}{user_test}"
         if not os.path.exists(filepath):
             os.makedirs(filepath)
             return filepath
@@ -92,7 +93,6 @@ class RecordTab(Tab):
                     return new_path
                 version += 1
            
-        
     
     def stop(self):
         if not self.playing:
@@ -143,5 +143,5 @@ class RecordTab(Tab):
         try:
             self.stop()
         except:
-            return
+            messagebox.showerror("Error", "Data couldn't be analyzed")
         

@@ -52,7 +52,6 @@ class CalibrationTab(Tab):
         y = 10
         #self.play_button.place(x=x, y=y)
         self.calibrate_button.place(x=x, y=y + 30)
-        self.stop_button.place(x=x, y=y + 60)
         self.instructions_button.place(x=x, y = y + 90)
         
         self.instructions = instructions.CalibrationInstructions()
@@ -120,6 +119,7 @@ class CalibrationTab(Tab):
         self.max_screen_w = self.app.root.winfo_screenwidth()
         self.max_screen_h = self.app.root.winfo_screenheight()
         self.canvas.config(width=self.max_screen_w, height=self.max_screen_h)
+        self.stop_button.place(anchor=CENTER, x = self.max_screen_w * 0.5, y = self.max_screen_h * 0.2)
 
         self.corner_coords = self.calibrator_manager.get_corner_calibration_order_position()
         self.calibrator_manager.get_current_relative_corner() 
@@ -150,7 +150,7 @@ class CalibrationTab(Tab):
 
         # Ponemos en verde el punto de control ya analizado
         if current_corner > 0:
-            img_id = self.corner_images[current_corner - 1]
+            img_id = self.corner_images[current_corner - 1]  
             self.canvas.itemconfig(img_id, image=self.green_circle_photo)
 
         # Comprobación de si hay puntos restantes
@@ -169,7 +169,7 @@ class CalibrationTab(Tab):
         y = 10
         #self.play_button.place(x=x, y=y)
         self.calibrate_button.place(x=x, y=y + 30)
-        self.stop_button.place(x=x, y=y + 60)
+        self.stop_button.place_forget()
         self.instructions_button.place(x=x, y = y + 90)
     # MARK: UPDATE
 

@@ -10,6 +10,7 @@ from App.Frames import slicer
 from VideoManagers.videoPlayer import VideoPlayer
 from App.Tabs.tab import Tab
 import json
+import os
 
 lastRecording = None
 
@@ -159,6 +160,9 @@ class VideoPlayerTab(Tab):
         if self.filePath:
             self.loadNewVideo = True
             print("Ruta del archivo seleccionado:", self.filePath)
+
+            self.directory_path = os.path.dirname(self.filePath)
+            print("Directorio del archivo:", self.directory_path)
         
 
     def __loadLastRecording(self):
@@ -230,6 +234,7 @@ class VideoPlayerTab(Tab):
             })
 
         jsonData = json.dumps({"Slices" : data}, indent=4)
+        #path = os.path.join()
         with open('data.json', 'w') as archivo:
             archivo.write(jsonData)
 

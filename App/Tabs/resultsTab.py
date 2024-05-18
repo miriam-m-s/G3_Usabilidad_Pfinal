@@ -1,12 +1,20 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
+
 from App.Tabs.tab import Tab
+import os
 
 from App.Frames.verticalScroller import VerticalScroller
+from App.Frames.resultData import ResultData
+from App.appConsts import Consts
+from App.Utils import jsonUtils
 
 class ResultsTab(Tab):
     json_path = "questions.json"
     sangria = 50
+
+    result_data = None
     
     def __init__(self, tab):
         self.tab = tab
@@ -15,10 +23,18 @@ class ResultsTab(Tab):
         
         self.vertical_scroller = VerticalScroller(self.tab)
         self.scrolled_frame = self.vertical_scroller.get_scrolled_frame()
-        #self.set_scrollbar()
+    
+        self.dir_combo = ttk.Combobox(self.scrolled_frame)
+        self.dir_combo.pack(side=LEFT)
+
+        self.analyze_button = Button(self.scrolled_frame, text="Analyze", command=self.analyze_dir)
+        self.analyze_button.pack(side=RIGHT)
+
         self.set_buttons()
 
     def on_entry_tab(self):   
+        listdir = self.load_user_test_dirs()
+        self.dir_combo['values'] = listdir
         return
     
     def update(self, dt):
@@ -34,21 +50,25 @@ class ResultsTab(Tab):
         # self.load_questions_button.place(x=50, y = 50)
         return
 
-    # def set_scrollbar(self):
-    #     self.scrollbar = Scrollbar(self.tab, orient=VERTICAL, command=self.canvas.yview)
-    #     self.scrollbar.pack(side=RIGHT, fill=Y)
-
-    #     # configure the canvas
-    #     self.canvas.configure(yscrollcommand=self.scrollbar.set)
-    #     self.canvas.bind('<Configure>', lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
-    #     self.target_frame = ttk.Frame(self.canvas, width=1200, height=900)
-    #     self.canvas.create_window((0, 0), window=self.target_frame, anchor="nw")
-    #     self.canvas.bind_all("<MouseWheel>", self.on_mousewheel)
-
     # MARK: CALLBACKS
        
+    def load_user_test_dirs(self):
+        listdir = []    
+        user_tests_dir = Consts.USER_TESTS_DIR
+        for item in os.listdir(user_tests_dir):
+            item_path = os.path.join(user_tests_dir, item)
+            if os.path.isdir(item_path):
+                listdir.append(item)
+        return listdir
 
-    # Para desplazar la vista vertical con la entrada de la rueda del ratón
-    # def on_mousewheel(self, event = None):
-    #     if event.delta:
-    #         self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+    def analyze_dir(self):
+        combo_string = self.dir_combo.get()
+        s_path = os.path.join(Consts.USER_TESTS_DIR, combo_string)
+
+        try: 
+            self.result_data = ResultData(self.scrolled_frame, s_path)
+            self.result_data.set_up()
+        except Exception as e:
+            error_message = f"Data couldn't be analyzed:\n{str(e)}"
+            messagebox.showerror("Error", error_message)
+        
