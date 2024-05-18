@@ -8,6 +8,8 @@ import json
 import os
 from App.Tabs import videoPlayerTab
 
+from App.appConsts import Consts
+
 class VideoRecorder:
 
     playing = False   
@@ -15,7 +17,7 @@ class VideoRecorder:
     tempVideoIdx = None
     availableTempIndexes = []
 
-    videoPath = 'UserTest/'
+    videoPath = Consts.USER_TESTS_DIR
 
     def __init__(self):
 
