@@ -170,6 +170,7 @@ class VideoPlayerTab(Tab):
             messagebox.showerror("Error", "You haven't recorded any video yet")
         else:
             self.filePath = lastRecording
+            self.directory_path = os.path.dirname(self.filePath)
             self.loadNewVideo = True
 
     def __checkEvents(self):
