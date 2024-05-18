@@ -28,6 +28,8 @@ class VideoRecorder:
 
     def start(self,user_test_path):  
 
+        self.videoPath = user_test_path
+
         self.__setAvailableTempIdx()
         self.out = cv2.VideoWriter(f'{user_test_path}/temp{self.tempVideoIdx}.mp4', 
             self.fourcc, 60, (self.width, self.height))
@@ -87,10 +89,10 @@ class VideoRecorder:
 
         print('Procesando video...')
         
-        temp = cv2.VideoCapture(f'{self.videoPath}temp{self.tempVideoIdx}.mp4')
+        temp = cv2.VideoCapture(f'{self.videoPath}/temp{self.tempVideoIdx}.mp4')
         
-        out = cv2.VideoWriter(f'{self.videoPath}video_{time}.mp4', self.fourcc, fps, (self.width, self.height))
-        lastRecording = f'{self.videoPath}video_circle_{time}.mp4'
+        out = cv2.VideoWriter(f'{self.videoPath}/video_{time}.mp4', self.fourcc, fps, (self.width, self.height))
+        lastRecording = f'{self.videoPath}/video_circle_{time}.mp4'
         out_circle = cv2.VideoWriter(lastRecording, self.fourcc, fps, (self.width, self.height))
 
         r = 30
