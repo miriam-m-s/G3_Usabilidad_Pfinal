@@ -78,4 +78,10 @@ class ResultsTab(Tab):
         except Exception as e:
             error_message = f"Data couldn't be analyzed:\n{str(e)}"
             messagebox.showerror("Error", error_message)
+
+        self.actualize_scrollable_frame()
         
+    def actualize_scrollable_frame(self):
+        # Method to update the scrollregion
+        self.vertical_scroller.canvas.update_idletasks()
+        self.vertical_scroller.canvas.configure(scrollregion=self.vertical_scroller.canvas.bbox("all"))
