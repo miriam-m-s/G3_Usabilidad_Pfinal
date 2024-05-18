@@ -20,15 +20,16 @@ class ResultsTab(Tab):
         self.tab = tab
 
     def set_up(self):
+        self.result_data = ResultData()
         
         self.vertical_scroller = VerticalScroller(self.tab)
         self.scrolled_frame = self.vertical_scroller.get_scrolled_frame()
-    
+
         self.dir_combo = ttk.Combobox(self.scrolled_frame)
-        self.dir_combo.pack(side=LEFT)
+        self.dir_combo.grid(column=0,row=0)
 
         self.analyze_button = Button(self.scrolled_frame, text="Analyze", command=self.analyze_dir)
-        self.analyze_button.pack(side=RIGHT)
+        self.analyze_button.grid(column=1, row=0)
 
         self.set_buttons()
 
@@ -64,11 +65,16 @@ class ResultsTab(Tab):
 
     def analyze_dir(self):
         combo_string = self.dir_combo.get()
+
+        if not combo_string:
+            messagebox.showerror("Error", "No test was uploaded")
+            return
+
         s_path = os.path.join(Consts.USER_TESTS_DIR, combo_string)
 
+        self.result_data.clear()
         try: 
-            self.result_data = ResultData(self.scrolled_frame, s_path)
-            self.result_data.set_up()
+            self.result_data.set_up(self.scrolled_frame, s_path, 1, combo_string)
         except Exception as e:
             error_message = f"Data couldn't be analyzed:\n{str(e)}"
             messagebox.showerror("Error", error_message)

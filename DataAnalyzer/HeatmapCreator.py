@@ -3,6 +3,7 @@ import datetime
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from io import BytesIO
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import math 
@@ -49,7 +50,16 @@ class dataAnalyzer:
             a=0.5
         map = sns.heatmap(heatData,cmap='coolwarm', annot=True, alpha=a, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según tiempo que se ha mirado a cada punto', fontsize =16)
-        plt.show()
+        #plt.show()
+
+        # Guardar la figura en un buffer de memoria
+        buf = BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        plt.close()
+
+        return buf
+
 
     #Creación un mapa de calor según cuantas veces se ha mirado cada posición de la pantalla
     def createCountHeatMap(coords, width, height,subdivisions = (1,1), background=""):

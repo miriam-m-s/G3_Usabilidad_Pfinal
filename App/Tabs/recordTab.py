@@ -1,7 +1,6 @@
 from App.Tabs.tab import Tab
 from tkinter import *
 from tkinter import ttk
-from tkinter import messagebox
 import tkinter as tk
 from PIL import Image, ImageTk
 import cv2
@@ -93,7 +92,8 @@ class RecordTab(Tab):
                     return new_path
                 version += 1
            
-    
+        
+
     def stop(self):
         if not self.playing:
             return
@@ -143,5 +143,5 @@ class RecordTab(Tab):
         try:
             self.stop()
         except:
-            messagebox.showerror("Error", "Data couldn't be analyzed")
+            return
         
