@@ -228,17 +228,33 @@ class VideoPlayerTab(Tab):
         data = []
 
         for slice in self.slicerList: 
+            if not slice.name.get():
+                messagebox.showerror("Error", "Slice name can not be empty")
+                return
+
+        for slice in self.slicerList: 
             data.append({
                 "Name": slice.name.get(),
                 "From": slice.from_slice.time,
                 "Until": slice.until_slice.time
             })
+            frame = self.videoPlayer.getFrame(slice.from_slice.time)
+
+            if frame is not None:
+                # Nombre del archivo PNG basado en el nombre del slice
+                output_filename = f"{slice.name.get()}.png"
+                output_filename = os.path.join(self.directory_path, output_filename)
+                # Guardar el frame como imagen PNG
+                cv2.imwrite(output_filename, frame)
+
 
         jsonData = json.dumps({"Slices" : data}, indent=4)
         path = os.path.join(self.directory_path, 'slices_data.json')
 
         with open(path, 'w') as archivo:
             archivo.write(jsonData)
+
+
 
 
       

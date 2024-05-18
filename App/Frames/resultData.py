@@ -46,7 +46,7 @@ class ResultData:
 
         id = init_row + 1
         for slice in sliced_json['Slices']:
-            self.generate_frame_data(event_json, event_path, slice, id)      
+            self.generate_frame_data(self, event_json, event_path, slice, id)      
             id += 1   
 
     def clear(self):       
@@ -59,18 +59,19 @@ class ResultData:
             self.title.grid_forget()
         
         
-    def generate_frame_data(self, event_data, event_path, processed_sliced_data, id):
-        frameData = FrameData(self.parent_frame, event_path, event_data, id)
+    def generate_frame_data(self, this, event_data, event_path, processed_sliced_data, id):
+        frameData = FrameData(this, self.parent_frame, event_path, event_data, id)
         frameData.display(processed_sliced_data)
         self.frame_data_array.append(frameData)
 
 
 class FrameData:
-    def __init__(self, parent_frame, event_path, data, id):
+    def __init__(self, result_data, parent_frame, event_path, data, id):
         self.frame = Frame(parent_frame, pady=10)
         self.frame.grid(column=0, row=id)
         self.event_data = data
         self.event_path = event_path
+        self.result_data = result_data
 
     def display(self, sliced):
         name = sliced['Name']
@@ -88,7 +89,9 @@ class FrameData:
         duration_label = Label(self.frame, text=f"Duration: {duration} sec")
         duration_label.pack()
 
-        self.heat_image, events = self.read_heat_map(duration)
+        frame_img_path = f"{self.result_data.data_dir}/{name}.png"
+        print(frame_img_path)
+        self.heat_image, events = self.read_heat_map(duration, frame_img_path)
 
         gather_label = Label(self.frame, text=f"Look events in this time lapse: {str(len(events))}")
         gather_label.pack()
@@ -100,10 +103,11 @@ class FrameData:
     def destroy(self):
         self.frame.destroy()
 
-    def read_heat_map(self, duration):
+    def read_heat_map(self, duration, background_path):
         init_timestamp = self.initial_timestamp
         data, w, h = dataAnalyzer.readData(self.event_path, init_timestamp, duration)
-        fig = dataAnalyzer.createTimeHeatMap(data, w, h)
+        
+        fig = dataAnalyzer.createTimeHeatMap(data, w, h, background=background_path)
         
         # Leer la imagen del buffer y convertirla a un objeto ImageTk
         image = Image.open(fig)

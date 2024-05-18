@@ -50,12 +50,13 @@ class dataAnalyzer:
             a=0.5
         map = sns.heatmap(heatData,cmap='coolwarm', annot=True, alpha=a, square=True, linewidths=.5, cbar=False)
         map.set_title('Mapa de calor según tiempo que se ha mirado a cada punto', fontsize =16)
-        #plt.show()
 
         # Guardar la figura en un buffer de memoria
         buf = BytesIO()
         plt.savefig(buf, format='png')
         buf.seek(0)
+        
+        plt.show()
         plt.close()
 
         return buf
