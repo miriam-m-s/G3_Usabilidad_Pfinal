@@ -234,8 +234,9 @@ class VideoPlayerTab(Tab):
             })
 
         jsonData = json.dumps({"Slices" : data}, indent=4)
-        #path = os.path.join()
-        with open('data.json', 'w') as archivo:
+        path = os.path.join(self.directory_path, 'slices_data.json')
+
+        with open(path, 'w') as archivo:
             archivo.write(jsonData)
 
 
