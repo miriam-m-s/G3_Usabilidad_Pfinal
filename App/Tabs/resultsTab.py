@@ -54,11 +54,12 @@ class ResultsTab(Tab):
        
     def load_user_test_dirs(self):
         listdir = []    
-        user_tests_dir = Consts.USER_TESTS_DIR
-        for item in os.listdir(user_tests_dir):
-            item_path = os.path.join(user_tests_dir, item)
-            if os.path.isdir(item_path):
-                listdir.append(item)
+        if os.path.exists(user_tests_dir) and os.path.isdir(user_tests_dir):
+            user_tests_dir = Consts.USER_TESTS_DIR
+            for item in os.listdir(user_tests_dir):
+                item_path = os.path.join(user_tests_dir, item)
+                if os.path.isdir(item_path):
+                    listdir.append(item)
         return listdir
 
     def analyze_dir(self):
