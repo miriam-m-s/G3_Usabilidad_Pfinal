@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from tkinter import messagebox
 import sys
 sys.path.append('./GazeTracking-master/')
 sys.path.append('./EyeTracker/')
@@ -10,6 +11,7 @@ from App.Tabs import recordTab
 from App.Tabs import resultsTab
 from EyeTracker.eyeTracker import EyeTracker
 from EyeTracker import calibrate
+
 
 import time
 
@@ -38,7 +40,7 @@ class App:
         #sv_ttk.set_theme("dark")
 
         self.eyeTracker = EyeTracker()
-        self.eyeTracker.setUp()
+        self.camera_available = self.eyeTracker.setUp()
 
         self.calibrator_manager = calibrate.CalibratorManager()
 
@@ -59,9 +61,6 @@ class App:
 
         #Los hacemos pack
         self.notebook.pack(fill="both", expand=True)
-        
-       
-
 
         # Creamos las clases que representan cada pestaña de la App
         self.tabs.append(calibrationTab.CalibrationTab(self.frame1, self.eyeTracker, self, self.calibrator_manager))
@@ -73,6 +72,7 @@ class App:
 
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_changed)
         self.root.bind('<Key>', self.key_pressed)  
+        self.root.after(500, self.check_good_init)
 
     def set_fullscreen(self, fullscren):
         self.root.attributes("-fullscreen", fullscren)
@@ -88,7 +88,11 @@ class App:
         self.lastUpdateTime = 0
         self.root.mainloop()
 
-    
+    def check_good_init(self):
+        if(not self.camera_available):
+            messagebox.showerror("Error", "Camera not found. Connect a camera and restart the app")
+            
+
     def on_tab_changed(self, event):
         
         #curentTab = self.notebook.select()

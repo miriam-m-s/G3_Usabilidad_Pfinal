@@ -12,7 +12,13 @@ class EyeTracker:
         assert(not self.inited)
         self.gaze = GazeTracking()
         self.webcam = cv2.VideoCapture(0)
+
+        if (not self.webcam.isOpened()):
+            return False
+        
         self.inited = True
+
+        return True
 
     def getFrame(self):
         # We get a new frame from the webcam
