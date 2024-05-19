@@ -33,6 +33,15 @@ class VideoPlayer:
             self.lastFrame = currentFrame
             return self.video.read()[1]      
         return None
+
+    def get_frame_as_image(self, time):
+        currentFrame = int(time / self.dt)
+        if currentFrame < self.nFrames:   
+            self.video.set(cv2.CAP_PROP_POS_FRAMES, currentFrame)
+            img = self.video.read()[1]      
+            self.video.set(cv2.CAP_PROP_POS_FRAMES, self.lastFrame)
+            return img
+        return None
     
     def getFrameFromFrameIncrease(self, frameIncrease):
         currentFrame = max(0, min(self.lastFrame + frameIncrease, self.nFrames - 1))

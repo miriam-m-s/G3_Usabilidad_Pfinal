@@ -23,20 +23,22 @@ class ResultData:
         # filtración de los archivos json
         json_files = [file for file in file_list if file.endswith('.json')]
 
-        # primer archivo que empieza por 'event'
-        event_file = next((file for file in json_files if file.startswith('event')))
-        #archivo de sliced_data
-        sliced_data_file = next((file for file in json_files if file.endswith('data.json')))
-
-        if not event_file:
+        try:
+            # primer archivo que empieza por 'event'
+            event_file = next((file for file in json_files if file.startswith('event')))
+        except:
             raise FileNotFoundError("Eye tracker events could not be found")
+        
+        try:
+            #archivo de sliced_data
+            sliced_data_file = next((file for file in json_files if file.endswith('data.json')))
+        except:
+            raise FileNotFoundError("Video has not been sliced")
+            
+
         
         event_path = os.path.join(self.data_dir, event_file)
         event_json = jsonUtils.recover_json_from_file(path=event_path)
-
-        #TODO Si no hay datos, añadir por defecto que analice el vídeo entero
-        if not sliced_data_file:
-            raise FileNotFoundError("Video has not been sliced")
         
         sliced_path = os.path.join(self.data_dir, sliced_data_file)
         sliced_json = jsonUtils.recover_json_from_file(sliced_path)

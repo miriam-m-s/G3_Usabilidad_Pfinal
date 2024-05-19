@@ -11,6 +11,7 @@ from VideoManagers.videoPlayer import VideoPlayer
 from App.Tabs.tab import Tab
 import json
 import os
+import glob
 
 lastRecording = None
 
@@ -232,13 +233,15 @@ class VideoPlayerTab(Tab):
                 messagebox.showerror("Error", "Slice name can not be empty")
                 return
 
+        self.clear_images()
+
         for slice in self.slicerList: 
             data.append({
                 "Name": slice.name.get(),
                 "From": slice.from_slice.time,
                 "Until": slice.until_slice.time
             })
-            frame = self.videoPlayer.getFrame(slice.from_slice.time)
+            frame = self.videoPlayer.get_frame_as_image(slice.from_slice.time)
 
             if frame is not None:
                 # Nombre del archivo PNG basado en el nombre del slice
@@ -246,7 +249,8 @@ class VideoPlayerTab(Tab):
                 output_filename = os.path.join(self.directory_path, output_filename)
                 # Guardar el frame como imagen PNG
                 cv2.imwrite(output_filename, frame)
-
+            else:
+                print(f"Error saving image {slice.name.get()}")
 
         jsonData = json.dumps({"Slices" : data}, indent=4)
         path = os.path.join(self.directory_path, 'slices_data.json')
@@ -255,7 +259,16 @@ class VideoPlayerTab(Tab):
             archivo.write(jsonData)
 
 
-
+    def clear_images(self):
+        subdir_path = os.path.join(self.directory_path, "*.png")        
+        archivos_png = glob.glob(subdir_path)
+        
+        # Itera sobre la lista de archivos y elimina cada uno
+        for archivo in archivos_png:
+            try:
+                os.remove(archivo)
+            except Exception as e:
+                print(f"Error at deleting {archivo}: {e}")
 
       
 
