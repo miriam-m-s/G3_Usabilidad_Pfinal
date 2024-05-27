@@ -80,6 +80,8 @@ class FrameData:
         start_time = sliced['From']
         end_time = sliced['Until']
         duration = round(end_time - start_time, 2)
+        timestamp = self.event_data['Events'][0]['timestamp']
+
         self.initial_timestamp = self.event_data['Events'][0]['timestamp'] + start_time
         
         title = Label(self.frame, text=f"Slice \"{name}\"", font=("Helvetica", 12, "bold"))
@@ -93,7 +95,7 @@ class FrameData:
 
         frame_img_path = f"{self.result_data.data_dir}/{name}.png"
         print(frame_img_path)
-        self.heat_image, events = self.read_heat_map(duration, frame_img_path)
+        self.heat_image, events = self.read_heat_map(start_time, duration, frame_img_path)
 
         gather_label = Label(self.frame, text=f"Look events in this time lapse: {str(len(events))}")
         gather_label.pack()
@@ -105,10 +107,10 @@ class FrameData:
     def destroy(self):
         self.frame.destroy()
 
-    def read_heat_map(self, duration, background_path):
-        init_timestamp = self.initial_timestamp
-        data, w, h = dataAnalyzer.readData(self.event_path, init_timestamp, duration)
-        
+    def read_heat_map(self, init_time, duration, background_path):
+
+        data, w, h = dataAnalyzer.readData(self.event_path, init_time, duration)
+
         fig = dataAnalyzer.createTimeHeatMap(data, w, h, background=background_path)
         
         # Leer la imagen del buffer y convertirla a un objeto ImageTk
